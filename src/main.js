@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import Planet from './planets';
 import GUI from 'lil-gui';
+import Stats from 'stats.js'
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -12,6 +13,11 @@ const scene = new THREE.Scene();
 
 // Debug GUI
 const gui = new GUI();
+
+// Add frame rate monitor
+const stats = new Stats()
+stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom)
 
 // Axes helper
 const axesHelper = new THREE.AxesHelper(5);
@@ -156,6 +162,9 @@ scene.add(solarSystem);
 const clock = new THREE.Clock();
 const tick = () =>
 {
+    // Update stats
+    stats.begin();
+
     const elapsedTime = clock.getElapsedTime();
 
     // Update controls
@@ -166,5 +175,7 @@ const tick = () =>
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick);
+
+    stats.end();
 }
 tick()
