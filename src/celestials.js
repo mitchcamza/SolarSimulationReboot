@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export default class Planet {
+export default class CelestialBody {
     constructor(radius, positionX, textureFile = null) {
         this.radius = radius;
         this.positionX = positionX;
@@ -16,11 +16,11 @@ export default class Planet {
             this.mesh.position.x += this.positionX;
 
             // Add an axes helper to the planet
-            const axesHelper = new THREE.AxesHelper(3);
+            const axesHelper = new THREE.AxesHelper(this.radius + 2);
             this.mesh.add(axesHelper);
             
             // DEBUG
-            console.log('Planet created at position X: ' + this.positionX + ' with radius: ' + this.radius + ' and texture: ' + this.textureFile);
+            // console.log('Celestial body created at position X: ' + this.positionX + ' with radius: ' + this.radius + ' and texture: ' + this.textureFile);
         }
         return this.mesh;
     }
