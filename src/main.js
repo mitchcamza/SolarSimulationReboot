@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -56,6 +57,10 @@ window.addEventListener('dblclick', () =>
     }
 });
 
+// Controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+
 // Sun
 const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
@@ -64,5 +69,19 @@ const solarSystem = new THREE.Group();
 solarSystem.add(sunMesh);
 scene.add(solarSystem);
 
-// Render the scene
-renderer.render(scene, camera);
+// Update the render loop
+const clock = new THREE.Clock()
+const tick = () =>
+{
+    const elapsedTime = clock.getElapsedTime()
+
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+tick()
