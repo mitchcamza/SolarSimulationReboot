@@ -158,24 +158,38 @@ solarSystem.add(mercuryGroup, venusGroup, earthGroup, marsGroup, jupiterGroup, s
 // Add solar system to scene
 scene.add(solarSystem);
 
-// Update the render loop
+// Clock
 const clock = new THREE.Clock();
+
+// Update the render loop
 const tick = () =>
 {
     // Update stats
     stats.begin();
 
+    // Get elapsed time
     const elapsedTime = clock.getElapsedTime();
+
+    // Update planets based on their orbital speed
+    mercuryGroup.rotation.y = elapsedTime / 0.24;
+    venusGroup.rotation.y = elapsedTime / 0.62;
+    earthGroup.rotation.y = elapsedTime / 1;
+    marsGroup.rotation.y = elapsedTime / 1.88;
+    jupiterGroup.rotation.y = elapsedTime / 11.86;
+    saturnGroup.rotation.y = elapsedTime / 29.46;
+    uranusGroup.rotation.y = elapsedTime / 84.01;
+    neptuneGroup.rotation.y = elapsedTime / 164.8;
 
     // Update controls
     controls.update();
 
-    // Render
+    // Update the renderer
     renderer.render(scene, camera);
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick);
 
+    // Update stats (end)
     stats.end();
 }
 tick()
