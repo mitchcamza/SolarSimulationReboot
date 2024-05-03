@@ -305,66 +305,6 @@ cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move
 cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
 cameraPosition.close();
 
-// FIXME: Camera follow controls
-const followFolder = cameraFolder.addFolder('Follow');
-followFolder.close();
-
-followFolder.add({ FollowSun: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = sunMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(sunMesh.position);
-} }, 'FollowSun').name('Sun');
-followFolder.add({ FollowMercury: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = mercuryMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(mercuryMesh.position);
-} }, 'FollowMercury').name('Mercury');
-followFolder.add({ FollowVenus: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = venusMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(venusMesh.position);
-} }, 'FollowVenus').name('Venus');
-followFolder.add({ FollowEarth: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = earthMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(earthMesh.position);
-} }, 'FollowEarth').name('Earth');
-followFolder.add({ FollowMars: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = marsMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(marsMesh.position);
-} }, 'FollowMars').name('Mars');
-followFolder.add({ FollowJupiter: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = jupiterMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(jupiterMesh.position);
-} }, 'FollowJupiter').name('Jupiter');
-followFolder.add({ FollowSaturn: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = saturnMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(saturnMesh.position);
-} }, 'FollowSaturn').name('Saturn');
-followFolder.add({ FollowUranus: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = uranusMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(uranusMesh.position);
-} }, 'FollowUranus').name('Uranus');
-followFolder.add({ FollowNeptune: () => { 
-    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
-    const targetPosition = neptuneMesh.position.clone().add(offset); // Calculate the target position with offset
-    camera.position.copy(targetPosition);
-    camera.lookAt(neptuneMesh.position);
-} }, 'FollowNeptune').name('Neptune');
-
-
 // Speed controls for planets and moons
 const speedFolder = gui.addFolder('Speed');
 let speedFactor = 0.1;
