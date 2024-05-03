@@ -286,6 +286,7 @@ solarSystem.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGr
 // Add solar system to scene
 scene.add(solarSystem);
 
+
 /**
  * Controls
  */
@@ -464,5 +465,3 @@ const tick = () =>
     stats.end();
 }
 tick()
-
-
