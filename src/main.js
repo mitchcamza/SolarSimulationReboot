@@ -45,30 +45,9 @@ scene.add(camera);
  * Controls
  */
 
-const gui = new GUI();
-
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-
-// Camera position controls
-const cameraFolder = gui.addFolder('Camera');
-const cameraPosition = cameraFolder.addFolder('Position');
-cameraPosition.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Camera X').listen();
-cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Camera Y').listen();
-cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Camera Z').listen();
-cameraPosition.close();
-
-// Camera rotation controls
-const cameraRotation = cameraFolder.addFolder('Rotation');
-cameraRotation.add(camera.rotation, 'x').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation X').listen();
-cameraRotation.add(camera.rotation, 'y').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation Y').listen();
-cameraRotation.add(camera.rotation, 'z').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation Z').listen();
-cameraRotation.close();
-cameraFolder.close();
-
-// Camera lookAt controls
-const lookAtFolder = cameraFolder.addFolder('Look At');
 
 /**
  * Renderer
@@ -326,6 +305,7 @@ solarSystem.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGr
 // Add solar system to scene
 scene.add(solarSystem);
 
+
 /**
  * Animation
  */
@@ -343,53 +323,48 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime();
 
     // Spin planets based on their axial tilt
-    mercuryMesh.rotation.y = elapsedTime / (0.01);
-    venusMesh.rotation.y = elapsedTime / (-0.01); // spins in the opposite direction
-    earthMesh.rotation.y = elapsedTime / (1);
-    marsMesh.rotation.y = elapsedTime / (1.03);
-    jupiterMesh.rotation.y = elapsedTime / (0.41);
-    saturnMesh.rotation.y = elapsedTime / (0.43);
-    uranusMesh.rotation.y = elapsedTime / (0.72);
-    neptuneMesh.rotation.y = elapsedTime / (0.67);
+    mercuryMesh.rotation.y = elapsedTime / 0.01;
+    venusMesh.rotation.y = elapsedTime / -0.01; // spins in the opposite direction
+    earthMesh.rotation.y = elapsedTime / 1;
+    marsMesh.rotation.y = elapsedTime / 1.03;
+    jupiterMesh.rotation.y = elapsedTime / 0.41;
+    saturnMesh.rotation.y = elapsedTime / 0.43;
+    uranusMesh.rotation.y = elapsedTime / 0.72;
+    neptuneMesh.rotation.y = elapsedTime / 0.67;
     
     // Update planets based on their orbital speed
-    mercuryOrbitGroup.rotation.y = elapsedTime / (0.24);
-    venusOrbitGroup.rotation.y = elapsedTime / (-0.62); // orbits in the opposite direction
-    earthOrbitGroup.rotation.y = elapsedTime / (1);
-    marsOrbitGroup.rotation.y = elapsedTime / (1.88);
-    jupiterOrbitGroup.rotation.y = elapsedTime / (11.86);
-    saturnOrbitGroup.rotation.y = elapsedTime / (29.46);
-    uranusOrbitGroup.rotation.y = elapsedTime / (84.01);
-    neptuneOrbitGroup.rotation.y = elapsedTime / (164.8);
+    mercuryOrbitGroup.rotation.y = elapsedTime / 0.24;
+    venusOrbitGroup.rotation.y = elapsedTime / 0.62; 
+    earthOrbitGroup.rotation.y = elapsedTime / 1;
+    marsOrbitGroup.rotation.y = elapsedTime / 1.88;
+    jupiterOrbitGroup.rotation.y = elapsedTime / 11.86;
+    saturnOrbitGroup.rotation.y = elapsedTime / 29.46;
+    uranusOrbitGroup.rotation.y = elapsedTime / 84.01;
+    neptuneOrbitGroup.rotation.y = elapsedTime / 164.8;
     
     // Update moons based on their orbital speed
-    earthLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    marsLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    jupiterLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    saturnLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    uranusLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    neptuneLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    neptuneLunaRetrogadeOrbitGroup.rotation.y = elapsedTime / (-0.0748);
+    earthLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    marsLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    jupiterLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    saturnLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    uranusLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    neptuneLunaOrbitGroup.rotation.y = elapsedTime / 0.0748;
+    neptuneLunaRetrogadeOrbitGroup.rotation.y = elapsedTime / -0.0748;
 
     // Rotate the moons along their own axes
-    earthLunaMesh.rotation.y = elapsedTime / (0.0748);
-    marsPhobosMesh.rotation.y = elapsedTime / (0.0748);
-    marsDeimosMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterIoMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterEuropaMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterGanymedeMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterCallistoMesh.rotation.y = elapsedTime / (0.0748);
-    saturnTitanMesh.rotation.y = elapsedTime / (0.0748);
-    saturnRheaMesh.rotation.y = elapsedTime / (0.0748);
-    uranusTitaniaMesh.rotation.y = elapsedTime / (0.0748);
-    uranusOberonMesh.rotation.y = elapsedTime / (0.0748);
-    neptuneTritonMesh.rotation.y = elapsedTime / (-0.0748);
-    neptuneProteusMesh.rotation.y = elapsedTime / (0.0748);
-
-    // TODO: 
-    
-    // Update controls
-    controls.update();
+    earthLunaMesh.rotation.y = elapsedTime / 0.0748;
+    marsPhobosMesh.rotation.y = elapsedTime / 0.0748;
+    marsDeimosMesh.rotation.y = elapsedTime / 0.0748;
+    jupiterIoMesh.rotation.y = elapsedTime / 0.0748;
+    jupiterEuropaMesh.rotation.y = elapsedTime / 0.0748;
+    jupiterGanymedeMesh.rotation.y = elapsedTime / 0.0748;
+    jupiterCallistoMesh.rotation.y = elapsedTime / 0.0748;
+    saturnTitanMesh.rotation.y = elapsedTime / 0.0748;
+    saturnRheaMesh.rotation.y = elapsedTime / 0.0748;
+    uranusTitaniaMesh.rotation.y = elapsedTime / 0.0748;
+    uranusOberonMesh.rotation.y = elapsedTime / 0.0748;
+    neptuneTritonMesh.rotation.y = elapsedTime / -0.0748;
+    neptuneProteusMesh.rotation.y = elapsedTime / 0.0748;
 
     // Update the renderer
     renderer.render(scene, camera);
@@ -401,3 +376,4 @@ const tick = () =>
     stats.end();
 }
 tick()
+
