@@ -36,39 +36,9 @@ scene.add(gridHelper);
 /**
  * Camera
  */
-const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 10000
-);
-camera.position.set(-16, 82, 0.4);
+const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 10000);
+camera.position.set(-34, 35, 67);
 scene.add(camera);
-
-/**
- * Controls
- */
-
-const gui = new GUI();
-
-// Orbit controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
-
-// Camera position controls
-const cameraFolder = gui.addFolder('Camera');
-const cameraPosition = cameraFolder.addFolder('Position');
-cameraPosition.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Camera X').listen();
-cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Camera Y').listen();
-cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Camera Z').listen();
-cameraPosition.close();
-
-// Camera rotation controls
-const cameraRotation = cameraFolder.addFolder('Rotation');
-cameraRotation.add(camera.rotation, 'x').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation X').listen();
-cameraRotation.add(camera.rotation, 'y').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation Y').listen();
-cameraRotation.add(camera.rotation, 'z').min(-Math.PI).max(Math.PI).step(0.01).name('Camera Rotation Z').listen();
-cameraRotation.close();
-cameraFolder.close();
-
-// Camera lookAt controls
-const lookAtFolder = cameraFolder.addFolder('Look At');
 
 /**
  * Renderer
@@ -120,25 +90,16 @@ window.addEventListener('dblclick', () =>
  */
 
 // Sun
-const sunGeometry = new THREE.SphereGeometry(8, 32, 32);
+const sunRadius = 8;
+const sunGeometry = new THREE.SphereGeometry(sunRadius, 32, 32);
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow', wireframe: true });
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 const solarSystem = new THREE.Group();
 solarSystem.add(sunMesh);
 
 /**
- * Planets
+ * Planets  
  */
-
-/* Adjusted scale and position of planets
-Mercury: Radius = 0.3 units, Position = (11, 0, 0)
-Venus: Radius = 0.75 units, Position = (16, 0, 0)
-Earth: Radius = 1 unit, Position = (22, 0, 0)
-Mars: Radius = 0.53 units, Position = (30, 0, 0)
-Jupiter: Radius = 3.5 units, Position = (52, 0, 0)
-Saturn: Radius = 3 units, Position = (96, 0, 0)
-Uranus: Radius = 1.25 units, Position = (192, 0, 0)
-Neptune: Radius = 1.2 units, Position = (300, 0, 0) */
 
 // Mercury
 const mercuryRadius = 0.3;
@@ -201,7 +162,6 @@ neptuneOrbitGroup.add(neptuneMesh);
  */
 
 // Note: Mercury and Venus do not have moons
-
 // TODO: Calculate moon radii and relative positions based on their parent planet
 
 /// Earth's moons (x1)
@@ -327,8 +287,156 @@ solarSystem.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGr
 scene.add(solarSystem);
 
 /**
+ * Controls
+ */
+
+const gui = new GUI();
+
+// Orbit controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+
+// Camera position controls
+const cameraFolder = gui.addFolder('Camera');
+const cameraPosition = cameraFolder.addFolder('Position');
+cameraPosition.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move X').listen();
+cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
+cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
+cameraPosition.close();
+
+// FIXME: Camera follow controls
+const followFolder = cameraFolder.addFolder('Follow');
+followFolder.close();
+
+followFolder.add({ FollowSun: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = sunMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(sunMesh.position);
+} }, 'FollowSun').name('Sun');
+followFolder.add({ FollowMercury: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = mercuryMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(mercuryMesh.position);
+} }, 'FollowMercury').name('Mercury');
+followFolder.add({ FollowVenus: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = venusMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(venusMesh.position);
+} }, 'FollowVenus').name('Venus');
+followFolder.add({ FollowEarth: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = earthMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(earthMesh.position);
+} }, 'FollowEarth').name('Earth');
+followFolder.add({ FollowMars: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = marsMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(marsMesh.position);
+} }, 'FollowMars').name('Mars');
+followFolder.add({ FollowJupiter: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = jupiterMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(jupiterMesh.position);
+} }, 'FollowJupiter').name('Jupiter');
+followFolder.add({ FollowSaturn: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = saturnMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(saturnMesh.position);
+} }, 'FollowSaturn').name('Saturn');
+followFolder.add({ FollowUranus: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = uranusMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(uranusMesh.position);
+} }, 'FollowUranus').name('Uranus');
+followFolder.add({ FollowNeptune: () => { 
+    const offset = new THREE.Vector3(0, 0, 10); // Set the offset distance from the target
+    const targetPosition = neptuneMesh.position.clone().add(offset); // Calculate the target position with offset
+    camera.position.copy(targetPosition);
+    camera.lookAt(neptuneMesh.position);
+} }, 'FollowNeptune').name('Neptune');
+
+
+// Speed controls for planets and moons
+const speedFolder = gui.addFolder('Speed');
+let speedFactor = 0.1;
+let speedMultiplier = 1.0;
+let speed = speedFactor * speedMultiplier;
+
+// Slider for speed
+const speedSlider = speedFolder.add({ speed: 1.0 }, 'speed', 0, 2, 0.1).name('Speed').listen();
+speedSlider.onChange((value) => {
+    speedMultiplier = value;
+    speed = speedFactor * speedMultiplier;
+});
+
+// Add a Speed Reset button
+speedFolder.add({ Reset: () => { 
+    speedMultiplier = 1.0;
+    speed = speedFactor * speedMultiplier;
+    speedSlider.setValue(1.0);
+} }, 'Reset').name('Reset');
+
+
+/**
  * Animation
  */
+function updateMoons(elapsedTime, speed) {
+    
+    // Update moons based on their orbital speed
+    earthLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    marsLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    jupiterLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    saturnLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    uranusLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    neptuneLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
+    neptuneLunaRetrogadeOrbitGroup.rotation.y = elapsedTime * speed / (-0.0748);
+
+    // Rotate the moons along their own axes
+    earthLunaMesh.rotation.y = elapsedTime * speed / (0.0748);
+    marsPhobosMesh.rotation.y = elapsedTime * speed / (0.0748);
+    marsDeimosMesh.rotation.y = elapsedTime * speed / (0.0748);
+    jupiterIoMesh.rotation.y = elapsedTime * speed / (0.0748);
+    jupiterEuropaMesh.rotation.y = elapsedTime * speed / (0.0748);
+    jupiterGanymedeMesh.rotation.y = elapsedTime * speed / (0.0748);
+    jupiterCallistoMesh.rotation.y = elapsedTime * speed / (0.0748);
+    saturnTitanMesh.rotation.y = elapsedTime * speed / (0.0748);
+    saturnRheaMesh.rotation.y = elapsedTime * speed / (0.0748);
+    uranusTitaniaMesh.rotation.y = elapsedTime * speed / (0.0748);
+    uranusOberonMesh.rotation.y = elapsedTime * speed / (0.0748);
+    neptuneTritonMesh.rotation.y = elapsedTime * speed / (-0.0748);
+    neptuneProteusMesh.rotation.y = elapsedTime * speed / (0.0748);
+}
+
+function updatePlanets(elapsedTime, speed) {
+    
+    // Spin planets based on their axial tilt
+    mercuryMesh.rotation.y = elapsedTime * speed / (0.01);
+    venusMesh.rotation.y = elapsedTime * speed / (-0.01); // venus spins in the opposite direction
+    earthMesh.rotation.y = elapsedTime * speed / (1);
+    marsMesh.rotation.y = elapsedTime * speed / (1.03);
+    jupiterMesh.rotation.y = elapsedTime * speed / (0.41);
+    saturnMesh.rotation.y = elapsedTime * speed / (0.43);
+    uranusMesh.rotation.y = elapsedTime * speed / (0.72);
+    neptuneMesh.rotation.y = elapsedTime * speed / (0.67);
+
+    // Update planets based on their orbital speed
+    mercuryOrbitGroup.rotation.y = elapsedTime * speed / (0.24);
+    venusOrbitGroup.rotation.y = elapsedTime * speed / (0.62);
+    earthOrbitGroup.rotation.y = elapsedTime * speed / (1);
+    marsOrbitGroup.rotation.y = elapsedTime * speed / (1.88);
+    jupiterOrbitGroup.rotation.y = elapsedTime * speed / (11.86);
+    saturnOrbitGroup.rotation.y = elapsedTime * speed / (29.46);
+    uranusOrbitGroup.rotation.y = elapsedTime * speed / (84.01);
+    neptuneOrbitGroup.rotation.y = elapsedTime * speed / (164.8);
+}
 
 // Clock
 const clock = new THREE.Clock();
@@ -342,54 +450,9 @@ const tick = () =>
     // Get elapsed time
     const elapsedTime = clock.getElapsedTime();
 
-    // Spin planets based on their axial tilt
-    mercuryMesh.rotation.y = elapsedTime / (0.01);
-    venusMesh.rotation.y = elapsedTime / (-0.01); // spins in the opposite direction
-    earthMesh.rotation.y = elapsedTime / (1);
-    marsMesh.rotation.y = elapsedTime / (1.03);
-    jupiterMesh.rotation.y = elapsedTime / (0.41);
-    saturnMesh.rotation.y = elapsedTime / (0.43);
-    uranusMesh.rotation.y = elapsedTime / (0.72);
-    neptuneMesh.rotation.y = elapsedTime / (0.67);
-    
-    // Update planets based on their orbital speed
-    mercuryOrbitGroup.rotation.y = elapsedTime / (0.24);
-    venusOrbitGroup.rotation.y = elapsedTime / (-0.62); // orbits in the opposite direction
-    earthOrbitGroup.rotation.y = elapsedTime / (1);
-    marsOrbitGroup.rotation.y = elapsedTime / (1.88);
-    jupiterOrbitGroup.rotation.y = elapsedTime / (11.86);
-    saturnOrbitGroup.rotation.y = elapsedTime / (29.46);
-    uranusOrbitGroup.rotation.y = elapsedTime / (84.01);
-    neptuneOrbitGroup.rotation.y = elapsedTime / (164.8);
-    
-    // Update moons based on their orbital speed
-    earthLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    marsLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    jupiterLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    saturnLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    uranusLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    neptuneLunaOrbitGroup.rotation.y = elapsedTime / (0.0748);
-    neptuneLunaRetrogadeOrbitGroup.rotation.y = elapsedTime / (-0.0748);
-
-    // Rotate the moons along their own axes
-    earthLunaMesh.rotation.y = elapsedTime / (0.0748);
-    marsPhobosMesh.rotation.y = elapsedTime / (0.0748);
-    marsDeimosMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterIoMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterEuropaMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterGanymedeMesh.rotation.y = elapsedTime / (0.0748);
-    jupiterCallistoMesh.rotation.y = elapsedTime / (0.0748);
-    saturnTitanMesh.rotation.y = elapsedTime / (0.0748);
-    saturnRheaMesh.rotation.y = elapsedTime / (0.0748);
-    uranusTitaniaMesh.rotation.y = elapsedTime / (0.0748);
-    uranusOberonMesh.rotation.y = elapsedTime / (0.0748);
-    neptuneTritonMesh.rotation.y = elapsedTime / (-0.0748);
-    neptuneProteusMesh.rotation.y = elapsedTime / (0.0748);
-
-    // TODO: 
-    
-    // Update controls
-    controls.update();
+    // Update planets and moons
+    updatePlanets(elapsedTime, speed);
+    updateMoons(elapsedTime, speed);
 
     // Update the renderer
     renderer.render(scene, camera);
@@ -401,3 +464,5 @@ const tick = () =>
     stats.end();
 }
 tick()
+
+
