@@ -37,7 +37,7 @@ scene.add(gridHelper);
  * Camera
  */
 const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 10000);
-camera.position.set(-34, 35, 67);
+camera.position.set(-10, 133, 110);
 scene.add(camera);
 
 /**
@@ -92,7 +92,7 @@ window.addEventListener('dblclick', () =>
 // Sun
 const sunRadius = 8;
 const sunGeometry = new THREE.SphereGeometry(sunRadius, 32, 32);
-const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow', wireframe: true });
+const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 const solarSystem = new THREE.Group();
 solarSystem.add(sunMesh);
@@ -293,6 +293,9 @@ scene.add(solarSystem);
 
 const gui = new GUI();
 
+// Allow controls to be visible when in fullscreen
+gui.domElement.style.zIndex = 1000;
+
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
@@ -325,6 +328,22 @@ speedFolder.add({ Reset: () => {
     speedSlider.setValue(1.0);
 } }, 'Reset').name('Reset');
 
+// Debug folder
+const debugFolder = gui.addFolder('Debug');
+debugFolder.add(controls, 'enabled').name('Orbit Controls');
+debugFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
+debugFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').onChange((value) => {
+    solarSystem.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+            object.material.wireframe = value;
+        }
+    });
+});
+
+// TODO: Add axes helper toggle to all celestial bodies
+// TODO: Show controls in fullscreen mode
+
+debugFolder.close();
 
 /**
  * Animation

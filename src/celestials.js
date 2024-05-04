@@ -11,16 +11,13 @@ export default class CelestialBody {
         if (this.mesh === undefined || this.mesh === null) {
             const geometry = new THREE.SphereGeometry(this.radius, 32, 32);
             const texture = new THREE.TextureLoader().load(this.textureFile);
-            const material = new THREE.MeshBasicMaterial({ color: 'white', wireframe: true });
+            const material = new THREE.MeshBasicMaterial({ wireframe: false });
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.position.x += this.positionX;
 
             // Add an axes helper to the planet
             const axesHelper = new THREE.AxesHelper(this.radius + 2);
-            this.mesh.add(axesHelper);
-            
-            // DEBUG
-            // console.log('Celestial body created at position X: ' + this.positionX + ' with radius: ' + this.radius + ' and texture: ' + this.textureFile);
+            // this.mesh.add(axesHelper);
         }
         return this.mesh;
     }
