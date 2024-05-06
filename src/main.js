@@ -5,6 +5,17 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js'
 
 /**
+ * Loaders
+ */
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+/**
+ * Base
+ */
+const gui = new GUI();
+const global = {}
+
+/**
  * Canvas
  */
 const canvas = document.querySelector('canvas.webgl');
@@ -14,6 +25,7 @@ const aspect = { width: window.innerWidth, height: window.innerHeight };
  * Scene
  */
 const scene = new THREE.Scene();
+scene.scale.set(10, 10, 10);
 
 // Frame rate monitor
 const stats = new Stats()
@@ -29,6 +41,36 @@ const gridHelper = new THREE.GridHelper(650, 650);
 scene.add(gridHelper);
 
 /**
+ * Update all materials
+ */
+const updateAllMaterials = () => 
+    {
+        scene.traverse((child) => 
+        {
+            if (child.isMesh && child.material.isMeshStandardMaterial)
+            {
+                // gui.add(child.material, 'envMapIntensity').min(0).max(10).step(0.001).name(`${child.name} envMapIntensity`)
+                child.material.envMapIntensity = global.envMapIntensity
+            }
+        })
+    }
+
+/** 
+ * Environment Map
+ */
+// LDR cube texture
+const environmentMap = cubeTextureLoader.load([
+    '/environmentMaps/skybox/right.png',
+    '/environmentMaps/skybox/left.png',
+    '/environmentMaps/skybox/top.png',
+    '/environmentMaps/skybox/bottom.png',
+    '/environmentMaps/skybox/front.png',
+    '/environmentMaps/skybox/back.png'
+])
+scene.environment = environmentMap
+scene.background = environmentMap
+
+/**
  * Lights
  */
 // TODO: Add simple lighting to the scene (more sophisticated lighting will be added later)
@@ -36,7 +78,7 @@ scene.add(gridHelper);
 /**
  * Camera
  */
-const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 5000);
 camera.position.set(-10, 133, 110);
 scene.add(camera);
 
@@ -91,7 +133,7 @@ window.addEventListener('dblclick', () =>
 
 // Sun
 const sunRadius = 8;
-const sunGeometry = new THREE.SphereGeometry(sunRadius, 32, 32);
+const sunGeometry = new THREE.SphereGeometry(sunRadius, 64, 64);
 const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 const solarSystem = new THREE.Group();
@@ -102,14 +144,14 @@ solarSystem.add(sunMesh);
  */
 
 // Mercury
-const mercuryRadius = 0.3;
+const mercuryRadius = 0.38;
 const mercury = new CelestialBody(mercuryRadius, 11);
 const mercuryMesh = mercury.getMesh();
 let mercuryOrbitGroup = new THREE.Group();
 mercuryOrbitGroup.add(mercuryMesh);
 
 // Venus
-const venusRadius = 0.75;
+const venusRadius = 0.95;
 const venus = new CelestialBody(venusRadius, 16);
 const venusMesh = venus.getMesh();
 let venusOrbitGroup = new THREE.Group();
@@ -291,8 +333,6 @@ scene.add(solarSystem);
  * Controls
  */
 
-const gui = new GUI();
-
 // Allow controls to be visible when in fullscreen
 gui.domElement.style.zIndex = 1000;
 
@@ -397,6 +437,14 @@ function updatePlanets(elapsedTime, speed) {
     uranusOrbitGroup.rotation.y = elapsedTime * speed / (84.01);
     neptuneOrbitGroup.rotation.y = elapsedTime * speed / (164.8);
 }
+
+// Add a visible ellipse for each planet's orbit
+const ellipseGeometry = new THREE.RingGeometry();
+const ellipseMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+const ellipse = new THREE.Line(ellipseGeometry, ellipseMaterial);
+scene.add(ellipse);
+
+
 
 // Clock
 const clock = new THREE.Clock();
