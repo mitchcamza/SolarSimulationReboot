@@ -337,11 +337,10 @@ controls.enableDamping = true
 
 // Camera position controls
 const cameraFolder = gui.addFolder('Camera');
-const cameraPosition = cameraFolder.addFolder('Position');
-cameraPosition.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move X').listen();
-cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
-cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
-cameraPosition.close();
+cameraFolder.add(controls, 'enabled').name('Orbit Controls');
+cameraFolder.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move X').listen();
+cameraFolder.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
+cameraFolder.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
 cameraFolder.close();
 
 // Speed controls for planets and moons
@@ -404,14 +403,20 @@ materialFolder.add({ Normal: false }, 'Normal').name('Toggle Normal').onChange((
     });
 });
 
-// Debug folder
-const debugFolder = gui.addFolder('Debug');
-debugFolder.add(controls, 'enabled').name('Orbit Controls');
-debugFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
-debugFolder.close();
+// Helpers folder
+const helperFolder = gui.addFolder('Helpers');
+helperFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
+helperFolder.close();
 
 // TODO: Add axes helper toggle to all celestial bodies
 // TODO: Show controls in fullscreen mode
+
+// Performance folder
+const performanceFolder = gui.addFolder('Performance');
+performanceFolder.add({ ShowStats: true }, 'ShowStats').name('Show stats').onChange((value) => {
+    if (value) { stats.showPanel(0); } 
+    else { stats.showPanel(-1); }
+});
 
 
 /**
