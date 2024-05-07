@@ -24,10 +24,19 @@ export default class CelestialBody {
     getMesh() {
         if (this.mesh === undefined || this.mesh === null) {
             const geometry = new THREE.SphereGeometry(this.radius, 32, 32);
-            const texture = new THREE.TextureLoader().load(this.textureFile);
-            const material = new THREE.MeshBasicMaterial({ wireframe: false });
+            const colorTexture = new THREE.TextureLoader().load(this.textureFile);
+            const material = new THREE.MeshLambertMaterial({ flatShading: true});
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.position.x += this.positionX;
+
+            // Set texture properties
+            colorTexture.colorSpace = THREE.SRGBColorSpace;
+            colorTexture.generateMipmaps = false
+            colorTexture.minFilter = THREE.NearestFilter
+
+            // Set shadow properties
+            this.mesh.receiveShadow = true;
+            this.mesh.castShadow = true;
 
             // Add an axes helper to the planet
             const axesHelper = new THREE.AxesHelper(this.radius * 1.5);
