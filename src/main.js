@@ -13,7 +13,6 @@ const cubeTextureLoader = new THREE.CubeTextureLoader();
  * Base
  */
 const gui = new GUI();
-const global = {}
 
 /**
  * Canvas
@@ -28,9 +27,9 @@ const scene = new THREE.Scene();
 scene.scale.set(10, 10, 10);
 
 // Frame rate monitor
-const stats = new Stats()
-stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom)
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom);
 
 // Axes helper
 const axesHelper = new THREE.AxesHelper(5);
@@ -40,25 +39,9 @@ scene.add(axesHelper);
 const gridHelper = new THREE.GridHelper(650, 650);
 scene.add(gridHelper);
 
-/**
- * Update all materials
- */
-const updateAllMaterials = () => 
-    {
-        scene.traverse((child) => 
-        {
-            if (child.isMesh && child.material.isMeshStandardMaterial)
-            {
-                // gui.add(child.material, 'envMapIntensity').min(0).max(10).step(0.001).name(`${child.name} envMapIntensity`)
-                child.material.envMapIntensity = global.envMapIntensity
-            }
-        })
-    }
-
 /** 
  * Environment Map
  */
-// LDR cube texture
 const environmentMap = cubeTextureLoader.load([
     '/environmentMaps/skybox/right.png',
     '/environmentMaps/skybox/left.png',
@@ -70,10 +53,14 @@ const environmentMap = cubeTextureLoader.load([
 scene.environment = environmentMap
 scene.background = environmentMap
 
+
 /**
  * Lights
  */
-// TODO: Add simple lighting to the scene (more sophisticated lighting will be added later)
+const pointLight = new THREE.PointLight(0xffffff, 1000, 0, 2);
+pointLight.position.set(0, 0, 0);
+pointLight.castShadow = true;
+scene.add(pointLight);
 
 /**
  * Camera
@@ -85,7 +72,7 @@ scene.add(camera);
 /**
  * Renderer
  */
-const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, physicallyCorrectLights: true });
 renderer.setSize(aspect.width, aspect.height);
 
 // Handle windows resize for responsiveness
@@ -132,69 +119,77 @@ window.addEventListener('dblclick', () =>
  */
 
 // Sun
-const sunRadius = 8;
-const sunGeometry = new THREE.SphereGeometry(sunRadius, 64, 64);
-const sunMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
-const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
-const solarSystem = new THREE.Group();
-solarSystem.add(sunMesh);
+const sunRadius = 15;
+const sun = new CelestialBody(sunRadius, 0, '/textures/2k_sun.jpg');
+const sunMesh = sun.getMesh();
+
+// Modify material to be emissive
+sunMesh.material = new THREE.MeshStandardMaterial({
+    map: sunMesh.material.map, // Preserve the existing texture
+    emissive: 0xffffff, // Set the emissive color to white
+    emissiveIntensity: 1, // Adjust intensity as needed
+    side: THREE.FrontSide // Ensure the material is visible from the inside
+});
+
+const solarSystemGroup = new THREE.Group();
+solarSystemGroup.add(sunMesh);
+
 
 /**
  * Planets  
  */
-
 // Mercury
 const mercuryRadius = 0.38;
-const mercury = new CelestialBody(mercuryRadius, 11);
+const mercury = new CelestialBody(mercuryRadius, 25);
 const mercuryMesh = mercury.getMesh();
 let mercuryOrbitGroup = new THREE.Group();
 mercuryOrbitGroup.add(mercuryMesh);
 
 // Venus
 const venusRadius = 0.95;
-const venus = new CelestialBody(venusRadius, 16);
+const venus = new CelestialBody(venusRadius, 40);
 const venusMesh = venus.getMesh();
 let venusOrbitGroup = new THREE.Group();
 venusOrbitGroup.add(venusMesh);
 
 // Earth
 const earthRadius = 1;
-const earth = new CelestialBody(earthRadius, 22);
+const earth = new CelestialBody(earthRadius, 55);
 const earthMesh = earth.getMesh();
 let earthOrbitGroup = new THREE.Group();
 earthOrbitGroup.add(earthMesh);
 
 // Mars
 const marsRadius = 0.53;
-const mars = new CelestialBody(marsRadius, 30);
+const mars = new CelestialBody(marsRadius, 70);
 const marsMesh = mars.getMesh();
 let marsOrbitGroup = new THREE.Group();
 marsOrbitGroup.add(marsMesh);
 
 // Jupiter
 const jupiterRadius = 3.5;
-const jupiter = new CelestialBody(jupiterRadius, 52);
+const jupiter = new CelestialBody(jupiterRadius, 85);
 const jupiterMesh = jupiter.getMesh();
 let jupiterOrbitGroup = new THREE.Group();
 jupiterOrbitGroup.add(jupiterMesh);
 
 // Saturn
 const saturnRadius = 3;
-const saturn = new CelestialBody(saturnRadius, 96);
+const saturn = new CelestialBody(saturnRadius, 100);
 const saturnMesh = saturn.getMesh();
 let saturnOrbitGroup = new THREE.Group();
 saturnOrbitGroup.add(saturnMesh);
 
 // Uranus
 const uranusRadius = 1.25;
-const uranus = new CelestialBody(uranusRadius, 192);
+const uranus = new CelestialBody(uranusRadius, 115);
 const uranusMesh = uranus.getMesh();
 let uranusOrbitGroup = new THREE.Group();
 uranusOrbitGroup.add(uranusMesh);
 
 // Neptune
 const neptuneRadius = 1.2;
-const neptune = new CelestialBody(neptuneRadius, 300);
+const neptune = new CelestialBody(neptuneRadius, 130);
 const neptuneMesh = neptune.getMesh();
 let neptuneOrbitGroup = new THREE.Group();
 neptuneOrbitGroup.add(neptuneMesh);
@@ -208,7 +203,7 @@ neptuneOrbitGroup.add(neptuneMesh);
 
 /// Earth's moons (x1)
 const earthLunaOrbitGroup = new THREE.Group();
-earthLunaOrbitGroup.position.x = earthMesh.position.x; 
+earthLunaOrbitGroup.position.x = earthMesh.position.x;
 
     // Luna
     const earthLuna = new CelestialBody(earthRadius * 0.273, earthMesh.position.x);
@@ -313,7 +308,7 @@ neptuneLunaRetrogadeOrbitGroup.position.x = neptuneMesh.position.x;
     neptuneProteusMesh.position.set((neptuneRadius + 3) * -1, 0, 0);
     neptuneLunaOrbitGroup.add(neptuneProteusMesh);
 
-/// Add moons to their respective planets
+// Add moons to their respective planets
 earthOrbitGroup.add(earthLunaOrbitGroup);
 marsOrbitGroup.add(marsLunaOrbitGroup);
 jupiterOrbitGroup.add(jupiterLunaOrbitGroup);
@@ -323,10 +318,10 @@ neptuneOrbitGroup.add(neptuneLunaOrbitGroup);
 neptuneOrbitGroup.add(neptuneLunaRetrogadeOrbitGroup);
 
 // Add planets to solar system
-solarSystem.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
+solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
 
 // Add solar system to scene
-scene.add(solarSystem);
+scene.add(solarSystemGroup);
 
 
 /**
@@ -347,6 +342,7 @@ cameraPosition.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move
 cameraPosition.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
 cameraPosition.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
 cameraPosition.close();
+cameraFolder.close();
 
 // Speed controls for planets and moons
 const speedFolder = gui.addFolder('Speed');
@@ -368,22 +364,55 @@ speedFolder.add({ Reset: () => {
     speedSlider.setValue(1.0);
 } }, 'Reset').name('Reset');
 
-// Debug folder
-const debugFolder = gui.addFolder('Debug');
-debugFolder.add(controls, 'enabled').name('Orbit Controls');
-debugFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
-debugFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').onChange((value) => {
-    solarSystem.traverse((object) => {
+// Material Folder
+const materialFolder = gui.addFolder('Materials');
+materialFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').onChange((value) => {
+    solarSystemGroup.traverse((object) => {
         if (object instanceof THREE.Mesh) {
-            object.material.wireframe = value;
+            object.material.wireframe = value; 
+        }});
+    });
+
+// Toggle MeshNormalMaterial
+materialFolder.add({ Normal: false }, 'Normal').name('Toggle Normal').onChange((value) => {
+    solarSystemGroup.traverse((object) => {
+        if (object instanceof THREE.Mesh) 
+        {
+            if (value) 
+            {
+                object.userData.originalMaterial = object.material;
+                object.material.dispose();
+                if (object.material.wireframe) 
+                {
+                    object.material = new THREE.MeshNormalMaterial({ wireframe: true });
+                } 
+                else 
+                {
+                    object.material = new THREE.MeshNormalMaterial();
+                }
+            } 
+            else 
+            {
+                if (object.userData.originalMaterial) 
+                {
+                    object.material.dispose();
+                    object.material = object.userData.originalMaterial;
+                    delete object.userData.originalMaterial;
+                }
+            }
         }
     });
 });
 
+// Debug folder
+const debugFolder = gui.addFolder('Debug');
+debugFolder.add(controls, 'enabled').name('Orbit Controls');
+debugFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
+debugFolder.close();
+
 // TODO: Add axes helper toggle to all celestial bodies
 // TODO: Show controls in fullscreen mode
 
-debugFolder.close();
 
 /**
  * Animation
