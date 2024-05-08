@@ -365,7 +365,7 @@ speedFolder.add({ Reset: () => {
 
 // Material Folder
 const materialFolder = gui.addFolder('Materials');
-materialFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').onChange((value) => {
+materialFolder.add({ Wireframe: false }, 'Wireframe').name('Wireframe').onChange((value) => {
     solarSystemGroup.traverse((object) => {
         if (object instanceof THREE.Mesh) {
             object.material.wireframe = value; 
@@ -373,7 +373,7 @@ materialFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').o
     });
 
 // Toggle MeshNormalMaterial
-materialFolder.add({ Normal: false }, 'Normal').name('Toggle Normal').onChange((value) => {
+materialFolder.add({ Normal: false }, 'Normal').name('Normal').onChange((value) => {
     solarSystemGroup.traverse((object) => {
         if (object instanceof THREE.Mesh) 
         {
@@ -408,7 +408,16 @@ const helperFolder = gui.addFolder('Helpers');
 helperFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
 helperFolder.close();
 
-// TODO: Add axes helper toggle to all celestial bodies
+// Toggle Axes Helper for all celestial bodies
+helperFolder.add({ AxesHelper: false }, 'AxesHelper').name('Axes Helper').setValue(false).onChange((value) => {
+    solarSystemGroup.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+            object.children[0].visible = value; 
+        }});
+    }   
+);
+
+
 // TODO: Show controls in fullscreen mode
 
 // Performance folder
