@@ -25,7 +25,7 @@ export default class CelestialBody {
         if (this.mesh === undefined || this.mesh === null) {
             const geometry = new THREE.SphereGeometry(this.radius, 32, 32);
             const colorTexture = new THREE.TextureLoader().load(this.textureFile);
-            const material = new THREE.MeshLambertMaterial({ flatShading: true });
+            const material = new THREE.MeshMatcapMaterial({ flatShading: true, map: colorTexture });
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.position.x += this.positionX;
 
@@ -39,6 +39,7 @@ export default class CelestialBody {
             this.mesh.castShadow = true;
 
             // Add an axes helper to the planet
+            // TODO: Move this to GUI helpers folder
             const axesHelper = new THREE.AxesHelper(this.radius * 1.5);
             this.mesh.add(axesHelper);
             axesHelper.visible = false;
