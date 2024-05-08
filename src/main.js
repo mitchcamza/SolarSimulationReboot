@@ -1,8 +1,16 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import CelestialBody from './celestials';
 import GUI from 'lil-gui';
 import Stats from 'stats.js'
+
+// import sun
+import { sunMesh } from './sun.js';
+
+// Import planets
+import { earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh } from './planets.js';
+
+// Import moons
+import { earthLunaOrbitGroup, marsLunaOrbitGroup, jupiterLunaOrbitGroup, saturnLunaOrbitGroup, uranusLunaOrbitGroup, neptuneLunaOrbitGroup, neptuneLunaRetrogadeOrbitGroup, earthLunaMesh, marsPhobosMesh, marsDeimosMesh, jupiterIoMesh, jupiterEuropaMesh, jupiterGanymedeMesh, jupiterCallistoMesh, saturnTitanMesh, saturnRheaMesh, uranusTitaniaMesh, uranusOberonMesh, neptuneTritonMesh, neptuneProteusMesh } from './moons.js';
 
 /**
  * Loaders
@@ -115,209 +123,14 @@ window.addEventListener('dblclick', () =>
 });
 
 /**
- * Stars
+ * Groups
  */
 
-// Sun
-const sunRadius = 15;
-const sun = new CelestialBody(sunRadius, 0, '/textures/2k_sun.jpg');
-const sunMesh = sun.getMesh();
-
-// Modify material to be emissive
-sunMesh.material = new THREE.MeshLambertMaterial({
-    map: sunMesh.material.map, // Preserve the existing texture
-    emissive: 0xffffff, // Set the emissive color to white
-    emissiveIntensity: 1, // Adjust intensity as needed
-    side: THREE.FrontSide // Ensure the material is visible from the inside
-});
-
+// Create a group for the solar system and add the sun to the group
 const solarSystemGroup = new THREE.Group();
 solarSystemGroup.add(sunMesh);
 
-
-/**
- * Planets  
- */
-// Mercury
-const mercuryRadius = 0.38;
-const mercury = new CelestialBody(mercuryRadius, 25);
-const mercuryMesh = mercury.getMesh();
-let mercuryOrbitGroup = new THREE.Group();
-mercuryOrbitGroup.add(mercuryMesh);
-
-// Venus
-const venusRadius = 0.95;
-const venus = new CelestialBody(venusRadius, 40);
-const venusMesh = venus.getMesh();
-let venusOrbitGroup = new THREE.Group();
-venusOrbitGroup.add(venusMesh);
-
-// Earth
-const earthRadius = 1;
-const earth = new CelestialBody(earthRadius, 55);
-const earthMesh = earth.getMesh();
-let earthOrbitGroup = new THREE.Group();
-earthOrbitGroup.add(earthMesh);
-
-// Mars
-const marsRadius = 0.53;
-const mars = new CelestialBody(marsRadius, 70);
-const marsMesh = mars.getMesh();
-let marsOrbitGroup = new THREE.Group();
-marsOrbitGroup.add(marsMesh);
-
-// Jupiter
-const jupiterRadius = 3.5;
-const jupiter = new CelestialBody(jupiterRadius, 85);
-const jupiterMesh = jupiter.getMesh();
-let jupiterOrbitGroup = new THREE.Group();
-jupiterOrbitGroup.add(jupiterMesh);
-
-// Saturn
-const saturnRadius = 3;
-const saturn = new CelestialBody(saturnRadius, 100);
-const saturnMesh = saturn.getMesh();
-let saturnOrbitGroup = new THREE.Group();
-saturnOrbitGroup.add(saturnMesh);
-
-// Uranus
-const uranusRadius = 1.25;
-const uranus = new CelestialBody(uranusRadius, 115);
-const uranusMesh = uranus.getMesh();
-let uranusOrbitGroup = new THREE.Group();
-uranusOrbitGroup.add(uranusMesh);
-
-// Neptune
-const neptuneRadius = 1.2;
-const neptune = new CelestialBody(neptuneRadius, 130);
-const neptuneMesh = neptune.getMesh();
-let neptuneOrbitGroup = new THREE.Group();
-neptuneOrbitGroup.add(neptuneMesh);
-
-/**
- * Moons
- */
-
-// Note: Mercury and Venus do not have moons
-// TODO: Calculate moon radii and relative positions based on their parent planet
-
-/// Earth's moons (x1)
-const earthLunaOrbitGroup = new THREE.Group();
-earthLunaOrbitGroup.position.x = earthMesh.position.x;
-
-    // Luna
-    const earthLuna = new CelestialBody(earthRadius * 0.273, earthMesh.position.x);
-    const earthLunaMesh = earthLuna.getMesh();
-    earthLunaMesh.position.set(earthRadius + 1, 0, 0);
-    earthLunaOrbitGroup.add(earthLunaMesh);
-
-/// Mars' moons (x2)
-const marsLunaOrbitGroup = new THREE.Group();
-marsLunaOrbitGroup.position.x = marsMesh.position.x;
-
-    // Phobos
-    const marsPhobos = new CelestialBody(marsRadius * 0.209, marsMesh.position.x);
-    const marsPhobosMesh = marsPhobos.getMesh();
-    marsPhobosMesh.position.set((marsRadius + 1.67), 0, 0);
-    marsLunaOrbitGroup.add(marsPhobosMesh);
-
-    // Deimos
-    const marsDeimos = new CelestialBody(marsRadius * 0.423, marsMesh.position.x);
-    const marsDeimosMesh = marsDeimos.getMesh();
-    marsDeimosMesh.position.set((marsRadius + 1.97) * -1, 0, 0);
-    marsLunaOrbitGroup.add(marsDeimosMesh);
-
-/// Jupiter's moons (x4)
-const jupiterLunaOrbitGroup = new THREE.Group();
-jupiterLunaOrbitGroup.position.x = jupiterMesh.position.x;
-
-    // Io
-    const jupiterIo = new CelestialBody(jupiterRadius * 0.058, jupiterMesh.position.x);
-    const jupiterIoMesh = jupiterIo.getMesh();
-    jupiterIoMesh.position.set(jupiterRadius + 3, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterIoMesh);
-
-    // Europa
-    const jupiterEuropa = new CelestialBody(jupiterRadius * 0.036, jupiterMesh.position.x);
-    const jupiterEuropaMesh = jupiterEuropa.getMesh();
-    jupiterEuropaMesh.position.set((jupiterRadius + 3.5) * -1, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterEuropaMesh);
-
-    // Ganymede
-    const jupiterGanymede = new CelestialBody(jupiterRadius * 0.026, jupiterMesh.position.x);
-    const jupiterGanymedeMesh = jupiterGanymede.getMesh();
-    jupiterGanymedeMesh.position.set((jupiterRadius + 0.8) * -1, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterGanymedeMesh);
-
-    // Callisto
-    const jupiterCallisto = new CelestialBody(jupiterRadius * 0.021, jupiterMesh.position.x);
-    const jupiterCallistoMesh = jupiterCallisto.getMesh();
-    jupiterCallistoMesh.position.set(jupiterRadius + 0.5, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterCallistoMesh);
-
-/// Saturn's moons (x2)
-const saturnLunaOrbitGroup = new THREE.Group();
-saturnLunaOrbitGroup.position.x = saturnMesh.position.x;
-
-    // Titan
-    const saturnTitan = new CelestialBody(saturnRadius * 0.128, saturnMesh.position.x);
-    const saturnTitanMesh = saturnTitan.getMesh();
-    saturnTitanMesh.position.set(saturnRadius + 4, 0, 0);
-    saturnLunaOrbitGroup.add(saturnTitanMesh);
-
-    // Rhea
-    const saturnRhea = new CelestialBody(saturnRadius * 0.067, saturnMesh.position.x);
-    const saturnRheaMesh = saturnRhea.getMesh();
-    saturnRheaMesh.position.set((saturnRadius + 4.5) * -1, 0, 0);
-    saturnLunaOrbitGroup.add(saturnRheaMesh);
-
-/// Uranus' moons (x2)
-const uranusLunaOrbitGroup = new THREE.Group();
-uranusLunaOrbitGroup.position.x = uranusMesh.position.x;
-
-    // Titania
-    const uranusTitania = new CelestialBody(uranusRadius * 0.16, uranusMesh.position.x);
-    const uranusTitaniaMesh = uranusTitania.getMesh();
-    uranusTitaniaMesh.position.set(uranusRadius + 5, 0, 0);
-    uranusLunaOrbitGroup.add(uranusTitaniaMesh);
-
-    // Oberon
-    const uranusOberon = new CelestialBody(uranusRadius * 0.08, uranusMesh.position.x);
-    const uranusOberonMesh = uranusOberon.getMesh();
-    uranusOberonMesh.position.set((uranusRadius + 5.5) * -1, 0, 0);
-    uranusLunaOrbitGroup.add(uranusOberonMesh);
-
-/// Neptune's moons (x2) 
-// Note: Neptune has 14 known moons, but only 2 are shown here 
-// TODO: Add more moons
-const neptuneLunaOrbitGroup = new THREE.Group();
-const neptuneLunaRetrogadeOrbitGroup = new THREE.Group();
-neptuneLunaOrbitGroup.position.x = neptuneMesh.position.x;
-neptuneLunaRetrogadeOrbitGroup.position.x = neptuneMesh.position.x;
-
-
-    // Triton
-    const neptuneTriton = new CelestialBody(neptuneRadius * 0.45, neptuneMesh.position.x);
-    const neptuneTritonMesh = neptuneTriton.getMesh();
-    neptuneTritonMesh.position.set(neptuneRadius + 9, 0, 0);
-    neptuneLunaRetrogadeOrbitGroup.add(neptuneTritonMesh);
-
-    // Proteus 
-    const neptuneProteus = new CelestialBody(neptuneRadius * 0.17, neptuneMesh.position.x);
-    const neptuneProteusMesh = neptuneProteus.getMesh();
-    neptuneProteusMesh.position.set((neptuneRadius + 3) * -1, 0, 0);
-    neptuneLunaOrbitGroup.add(neptuneProteusMesh);
-
-// Add moons to their respective planets
-earthOrbitGroup.add(earthLunaOrbitGroup);
-marsOrbitGroup.add(marsLunaOrbitGroup);
-jupiterOrbitGroup.add(jupiterLunaOrbitGroup);
-saturnOrbitGroup.add(saturnLunaOrbitGroup);
-uranusOrbitGroup.add(uranusLunaOrbitGroup);
-neptuneOrbitGroup.add(neptuneLunaOrbitGroup);
-neptuneOrbitGroup.add(neptuneLunaRetrogadeOrbitGroup);
-
-// Add planets to solar system
+// Add planet orbit groups to solar system
 solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
 
 // Add solar system to scene
@@ -327,6 +140,7 @@ scene.add(solarSystemGroup);
 /**
  * Controls
  */
+// TODO: Show controls in fullscreen mode
 
 // Allow controls to be visible when in fullscreen
 gui.domElement.style.zIndex = 1000;
@@ -365,7 +179,7 @@ speedFolder.add({ Reset: () => {
 
 // Material Folder
 const materialFolder = gui.addFolder('Materials');
-materialFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').onChange((value) => {
+materialFolder.add({ Wireframe: false }, 'Wireframe').name('Wireframe').onChange((value) => {
     solarSystemGroup.traverse((object) => {
         if (object instanceof THREE.Mesh) {
             object.material.wireframe = value; 
@@ -373,7 +187,7 @@ materialFolder.add({ Wireframe: false }, 'Wireframe').name('Toggle Wireframe').o
     });
 
 // Toggle MeshNormalMaterial
-materialFolder.add({ Normal: false }, 'Normal').name('Toggle Normal').onChange((value) => {
+materialFolder.add({ Normal: false }, 'Normal').name('Normal').onChange((value) => {
     solarSystemGroup.traverse((object) => {
         if (object instanceof THREE.Mesh) 
         {
@@ -408,8 +222,14 @@ const helperFolder = gui.addFolder('Helpers');
 helperFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
 helperFolder.close();
 
-// TODO: Add axes helper toggle to all celestial bodies
-// TODO: Show controls in fullscreen mode
+// Toggle Axes Helper for all celestial bodies
+helperFolder.add({ AxesHelper: false }, 'AxesHelper').name('Axes Helper').setValue(false).onChange((value) => {
+    solarSystemGroup.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+            object.children[0].visible = value; 
+        }});
+    }   
+);
 
 // Performance folder
 const performanceFolder = gui.addFolder('Performance');
