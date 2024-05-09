@@ -16,6 +16,10 @@ mercuryOrbitGroup.add(mercuryMesh);
 
 // Venus
 const venusRadius = 0.95;
+/**
+ * Represents the planet Venus.
+ * @type {CelestialBody}
+ */
 const venus = new CelestialBody(venusRadius, 40, 'textures/2k_venus_atmosphere.jpg');
 export const venusMesh = venus.getMesh();
 export let venusOrbitGroup = new THREE.Group();
