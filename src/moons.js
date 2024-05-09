@@ -51,6 +51,10 @@ jupiterLunaOrbitGroup.position.x = jupiterMesh.position.x;
     jupiterLunaOrbitGroup.add(jupiterEuropaMesh);
 
     // Ganymede
+    /**
+     * Represents the Ganymede moon of Jupiter.
+     * @type {CelestialBody}
+     */
     const jupiterGanymede = new CelestialBody(jupiterRadius * 0.026, jupiterMesh.position.x, 'textures/ganymede.jpg');
     export const jupiterGanymedeMesh = jupiterGanymede.getMesh();
     jupiterGanymedeMesh.position.set((jupiterRadius + 0.8) * -1, 0, 0);

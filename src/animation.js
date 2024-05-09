@@ -4,6 +4,12 @@ import { earthLunaOrbitGroup, marsLunaOrbitGroup, jupiterLunaOrbitGroup, saturnL
 /**
  * Animation
  */
+/**
+ * Updates the positions of the moons based on the elapsed time and speed.
+ * 
+ * @param {number} elapsedTime - The elapsed time in seconds.
+ * @param {number} speed - The speed factor.
+ */
 export function updateMoons(elapsedTime, speed) {
 
     // Update moons based on their orbital speed
