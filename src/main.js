@@ -7,7 +7,7 @@ import Stats from 'stats.js'
 import { sunMesh } from './sun.js';
 
 // Import planets and moons
-import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup } from './planets.js';
+import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh, earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh } from './planets.js';
 
 // Import animation functions
 import { updatePlanets, updateMoons } from './animation.js';
@@ -155,7 +155,91 @@ cameraFolder.add(controls, 'enabled').name('Orbit Controls');
 cameraFolder.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move X').listen();
 cameraFolder.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
 cameraFolder.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
+
+// Reset camera position
+cameraFolder.add({ Reset: () => {
+    camera.position.set(-10, 133, 110);
+    camera.lookAt(sunMesh.position);
+} }, 'Reset').name('Reset');
+
 cameraFolder.close();
+
+// Add a list of planet names to the GUI
+const celestials = ['Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+const followFolder = gui.addFolder('Follow');
+
+// Add a button for each planet to focus the camera on the planet
+celestials.forEach((celestial) => {
+    followFolder.add({ [`Follow${celestial}`]: () => {
+        const offset = new THREE.Vector3(0, 0, 50); // Set the offset distance from the target
+        const targetPosition = eval(`${celestial.toLowerCase()}Mesh`).position.clone().add(offset); // Calculate the target position with offset
+        camera.position.copy(targetPosition);
+        camera.lookAt(eval(`${celestial.toLowerCase()}Mesh`).position);
+    }
+    }, `Follow${celestial}`).name(celestial);
+});
+followFolder.close();
+
+// Handle planet click event
+/**
+ * Handles the click event on a planet.
+ * @param {string} name - The name of the planet that was clicked.
+ */
+function handlePlanetClick(name) {
+    let planetMesh;
+    // Determine which planet was clicked and get its corresponding Three.js mesh
+    switch(name) {
+        case 'Mercury':
+            planetMesh = mercuryMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Venus':
+            planetMesh = venusMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Earth':
+            planetMesh = earthMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Mars':
+            planetMesh = marsMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Jupiter':
+            planetMesh = jupiterMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Saturn':
+            planetMesh = saturnMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Uranus':
+            planetMesh = uranusMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        case 'Neptune':
+            planetMesh = neptuneMesh;
+            console.log('Clicked on', planetMesh.name)
+            break;
+        default:
+            console.error('Invalid planet name:', name);
+            return;
+    }
+
+    // Focus the camera on the selected planet
+    focusCameraOnObject(planetMesh);
+}
+
+// Function to focus the camera on a specific object
+function focusCameraOnObject(object) {
+    // Calculate the position to focus the camera on
+    const targetPosition = object.position.clone();
+    // Animate the camera's position to focus on the target position
+    new TWEEN.Tween(camera.position)
+        .to(targetPosition.clone().add(new THREE.Vector3(0, 10, 30)), 1000) // Example offset for better view
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .start();
+}
 
 // Speed controls for planets and moons
 const speedFolder = gui.addFolder('Speed');
@@ -176,6 +260,7 @@ speedFolder.add({ Reset: () => {
     speed = speedFactor * speedMultiplier;
     speedSlider.setValue(1.0);
 } }, 'Reset').name('Reset');
+speedFolder.close();
 
 // Material Folder
 const materialFolder = gui.addFolder('Materials');
@@ -216,6 +301,7 @@ materialFolder.add({ Normal: false }, 'Normal').name('Normal').onChange((value) 
         }
     });
 });
+materialFolder.close();
 
 // Helpers folder
 const helperFolder = gui.addFolder('Helpers');
@@ -237,6 +323,7 @@ performanceFolder.add({ ShowStats: true }, 'ShowStats').name('Show stats').onCha
     if (value) { stats.showPanel(0); } 
     else { stats.showPanel(-1); }
 });
+performanceFolder.close();
 
 
 // Clock
