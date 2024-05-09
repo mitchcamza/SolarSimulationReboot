@@ -47,7 +47,7 @@ https://solar-simulation-reboot.vercel.app
 ## Credits
 
 - [Three.js](https://threejs.org/) - 3D rendering library
-- [Lil-GUI](https://github.com/brianferguson/lil-gui) - GUI library for Three.js
+- [Lil-GUI](https://lil-gui.georgealways.com) - GUI library for Three.js
 - [Stats.js](https://github.com/mrdoob/stats.js/) - Performance monitoring library
 - [NASA-3D-Resources](https://github.com/nasa/NASA-3D-Resources/tree/master) - Moon textures
 - [solarsystemscope](https://www.solarsystemscope.com/textures/) - Planet textures
