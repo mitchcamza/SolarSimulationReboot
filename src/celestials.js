@@ -25,14 +25,14 @@ export default class CelestialBody {
         if (this.mesh === undefined || this.mesh === null) {
             const geometry = new THREE.SphereGeometry(this.radius, 32, 32);
             const colorTexture = new THREE.TextureLoader().load(this.textureFile);
-            const material = new THREE.MeshMatcapMaterial({ flatShading: true, map: colorTexture });
+            const material = new THREE.MeshLambertMaterial({ map: colorTexture });
             this.mesh = new THREE.Mesh(geometry, material);
             this.mesh.position.x += this.positionX;
 
             // Set texture properties
             colorTexture.colorSpace = THREE.SRGBColorSpace;
-            colorTexture.generateMipmaps = false
-            colorTexture.minFilter = THREE.NearestFilter
+            colorTexture.generateMipmaps = false;
+            colorTexture.minFilter = THREE.NearestFilter;
 
             // Set shadow properties
             this.mesh.receiveShadow = true;

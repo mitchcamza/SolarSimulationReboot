@@ -4,7 +4,7 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js'
 
 // import sun
-import { sunMesh } from './sun.js';
+import { sunMesh, sunlightColor } from './sun.js';
 
 // Import planets and moons
 import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh, earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh } from './planets.js';
@@ -65,10 +65,16 @@ scene.background = environmentMap
 /**
  * Lights
  */
-const pointLight = new THREE.PointLight(0xffffff, 1000, 0, 2);
-pointLight.position.set(0, 0, 0);
+
+// Point light
+const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
+pointLight.position.copy(sunMesh.position);
 pointLight.castShadow = true;
-scene.add(pointLight);
+sunMesh.add(pointLight);
+
+// Ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+scene.add(ambientLight);
 
 /**
  * Camera
@@ -82,6 +88,7 @@ scene.add(camera);
  */
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, physicallyCorrectLights: true });
 renderer.setSize(aspect.width, aspect.height);
+renderer.castShadow = true;
 
 // Handle windows resize for responsiveness
 window.addEventListener('resize', () =>
@@ -129,6 +136,8 @@ window.addEventListener('dblclick', () =>
 // Create a group for the solar system and add the sun to the group
 const solarSystemGroup = new THREE.Group();
 solarSystemGroup.add(sunMesh);
+console.log('sunMesh', sunMesh);
+console.log('solarSystemGroup', solarSystemGroup);
 
 // Add planet orbit groups to solar system
 solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
@@ -148,6 +157,24 @@ gui.domElement.style.zIndex = 1000;
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+
+// Add light controls to the GUI
+const lightsFolder = gui.addFolder('Lights')
+lightsFolder
+    .add(pointLight, 'intensity')
+    .min(0)
+    .max(10000)
+    .step(1)
+    .name('Point Light Intensity')
+    .listen()
+
+lightsFolder
+    .add(ambientLight, 'intensity')
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name('Ambient Light Intensity')
+    .listen();
 
 // Camera position controls
 const cameraFolder = gui.addFolder('Camera');
@@ -316,6 +343,12 @@ helperFolder.add({ AxesHelper: false }, 'AxesHelper').name('Axes Helper').setVal
         }});
     }   
 );
+
+// Add a point light helper
+const pointLightHelper = new THREE.PointLightHelper(pointLight, 2);
+pointLightHelper.visible = false;
+helperFolder.add(pointLightHelper, 'visible').name('Point Light Helper').listen();
+scene.add(pointLightHelper);
 
 // Performance folder
 const performanceFolder = gui.addFolder('Performance');
