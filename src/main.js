@@ -15,12 +15,7 @@ import { updatePlanets, updateMoons } from './animation.js';
 /**
  * Loaders
  */
-const cubeTextureLoader = new THREE.CubeTextureLoader();
-
-/**
- * Base
- */
-const gui = new GUI();
+const environmentMapTextureLoader = new THREE.CubeTextureLoader();
 
 /**
  * Canvas
@@ -50,7 +45,7 @@ scene.add(gridHelper);
 /** 
  * Environment Map
  */
-const environmentMap = cubeTextureLoader.load([
+const environmentMap = environmentMapTextureLoader.load([
     '/environmentMaps/skybox/right.png',
     '/environmentMaps/skybox/left.png',
     '/environmentMaps/skybox/top.png',
@@ -80,7 +75,7 @@ scene.add(ambientLight);
  * Camera
  */
 const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 5000);
-camera.position.set(-10, 133, 110);
+camera.position.set(-76, 28, 70);
 scene.add(camera);
 
 /**
@@ -150,6 +145,8 @@ scene.add(solarSystemGroup);
  * Controls
  */
 // TODO: Show controls in fullscreen mode
+const gui = new GUI();
+
 
 // Allow controls to be visible when in fullscreen
 gui.domElement.style.zIndex = 1000;

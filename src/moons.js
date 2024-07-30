@@ -1,120 +1,174 @@
 import * as THREE from 'three';
-import CelestialBody from './celestials.js';
-import { earthMesh, earthRadius, marsMesh, marsRadius, jupiterMesh, jupiterRadius, saturnMesh, saturnRadius, uranusMesh, uranusRadius, neptuneMesh, neptuneRadius, earthOrbitGroup, jupiterOrbitGroup, marsOrbitGroup, neptuneOrbitGroup, saturnOrbitGroup, uranusOrbitGroup } from './planets.js';
+import 
+{
+    earthMesh, earthRadius, earthOrbitGroup,
+    marsMesh, marsRadius, marsOrbitGroup,
+    jupiterMesh, jupiterRadius, jupiterOrbitGroup,
+    saturnMesh, saturnRadius, saturnOrbitGroup,
+    uranusMesh, uranusRadius, uranusOrbitGroup,
+    neptuneMesh, neptuneRadius, neptuneOrbitGroup
+} from './planets.js';
+
 
 /**
  * Moons
  */
-// Note: Mercury and Venus do not have moons
-// TODO: Calculate moon radii and relative positions based on their parent planet
-// TODO: Refactor to use a class for moons
 
-/// Earth's moons (x1)
+function createMoon({ radius, parentPlanet, positionX, texture }) 
+{
+    const geometry = new THREE.SphereGeometry(radius, 32, 32);
+    const material = new THREE.MeshStandardMaterial({
+        map: new THREE.TextureLoader().load(texture)
+    });
+    const moon = new THREE.Mesh(geometry, material);
+    moon.position.set(positionX, 0, 0); // Position relative to orbit group
+    moon.receiveShadow = true;
+    moon.castShadow = true;
+    return moon;
+}
+
+// Earth's moon
 export const earthLunaOrbitGroup = new THREE.Group();
-earthLunaOrbitGroup.position.x = earthMesh.position.x;
-    // Luna
-    const earthLuna = new CelestialBody(earthRadius * 0.273, earthMesh.position.x, 'textures/2k_moon.jpg');
-    export const earthLunaMesh = earthLuna.getMesh();
-    earthLunaMesh.position.set(earthRadius + 1, 0, 0);
-    earthLunaOrbitGroup.add(earthLunaMesh);
+earthLunaOrbitGroup.position.copy(earthMesh.position);
 
-/// Mars' moons (x2)
+const earthLuna = createMoon({
+    radius: earthRadius * 0.273,
+    parentPlanet: earthMesh,
+    positionX: earthRadius + 1,
+    texture: 'textures/2k_moon.jpg'
+});
+export const earthLunaMesh = earthLuna;
+earthLunaOrbitGroup.add(earthLunaMesh);
+
+// Mars' moons
 export const marsLunaOrbitGroup = new THREE.Group();
-marsLunaOrbitGroup.position.x = marsMesh.position.x;
+marsLunaOrbitGroup.position.copy(marsMesh.position);
 
-    // Phobos
-    const marsPhobos = new CelestialBody(marsRadius * 0.209, marsMesh.position.x, 'textures/phobos.jpg');
-    export const marsPhobosMesh = marsPhobos.getMesh();
-    marsPhobosMesh.position.set((marsRadius + 1.67), 0, 0);
-    marsLunaOrbitGroup.add(marsPhobosMesh);
+const marsPhobos = createMoon({
+    radius: marsRadius * 0.209,
+    parentPlanet: marsMesh,
+    positionX: marsRadius + 1.67,
+    texture: 'textures/phobos.jpg'
+});
+export const marsPhobosMesh = marsPhobos;
+marsLunaOrbitGroup.add(marsPhobosMesh);
 
-    // Deimos
-    const marsDeimos = new CelestialBody(marsRadius * 0.423, marsMesh.position.x, 'textures/deimos.jpg');
-    export const marsDeimosMesh = marsDeimos.getMesh();
-    marsDeimosMesh.position.set((marsRadius + 1.97) * -1, 0, 0);
-    marsLunaOrbitGroup.add(marsDeimosMesh);
+const marsDeimos = createMoon({
+    radius: marsRadius * 0.423,
+    parentPlanet: marsMesh,
+    positionX: -marsRadius - 1.97,
+    texture: 'textures/deimos.jpg'
+});
+export const marsDeimosMesh = marsDeimos;
+marsLunaOrbitGroup.add(marsDeimosMesh);
 
-/// Jupiter's moons (x4)
+// Jupiter's moons
 export const jupiterLunaOrbitGroup = new THREE.Group();
-jupiterLunaOrbitGroup.position.x = jupiterMesh.position.x;
+jupiterLunaOrbitGroup.position.copy(jupiterMesh.position);
 
-    // Io
-    const jupiterIo = new CelestialBody(jupiterRadius * 0.058, jupiterMesh.position.x, 'textures/io.jpg');
-    export const jupiterIoMesh = jupiterIo.getMesh();
-    jupiterIoMesh.position.set(jupiterRadius + 3, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterIoMesh);
+const jupiterIo = createMoon({
+    radius: jupiterRadius * 0.058,
+    parentPlanet: jupiterMesh,
+    positionX: jupiterRadius + 3,
+    texture: 'textures/io.jpg'
+});
+export const jupiterIoMesh = jupiterIo;
+jupiterLunaOrbitGroup.add(jupiterIoMesh);
 
-    // Europa
-    const jupiterEuropa = new CelestialBody(jupiterRadius * 0.036, jupiterMesh.position.x, 'textures/europa.jpg');
-    export const jupiterEuropaMesh = jupiterEuropa.getMesh();
-    jupiterEuropaMesh.position.set((jupiterRadius + 3.5) * -1, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterEuropaMesh);
+const jupiterEuropa = createMoon({
+    radius: jupiterRadius * 0.036,
+    parentPlanet: jupiterMesh,
+    positionX: -jupiterRadius - 3.5,
+    texture: 'textures/europa.jpg'
+});
+export const jupiterEuropaMesh = jupiterEuropa;
+jupiterLunaOrbitGroup.add(jupiterEuropaMesh);
 
-    // Ganymede
-    const jupiterGanymede = new CelestialBody(jupiterRadius * 0.026, jupiterMesh.position.x, 'textures/ganymede.jpg');
-    export const jupiterGanymedeMesh = jupiterGanymede.getMesh();
-    jupiterGanymedeMesh.position.set((jupiterRadius + 0.8) * -1, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterGanymedeMesh);
+const jupiterGanymede = createMoon({
+    radius: jupiterRadius * 0.026,
+    parentPlanet: jupiterMesh,
+    positionX: -jupiterRadius - 0.8,
+    texture: 'textures/ganymede.jpg'
+});
+export const jupiterGanymedeMesh = jupiterGanymede;
+jupiterLunaOrbitGroup.add(jupiterGanymedeMesh);
 
-    // Callisto
-    const jupiterCallisto = new CelestialBody(jupiterRadius * 0.021, jupiterMesh.position.x, 'textures/callisto.jpg');
-    export const jupiterCallistoMesh = jupiterCallisto.getMesh();
-    jupiterCallistoMesh.position.set(jupiterRadius + 0.5, 0, 0);
-    jupiterLunaOrbitGroup.add(jupiterCallistoMesh);
+const jupiterCallisto = createMoon({
+    radius: jupiterRadius * 0.021,
+    parentPlanet: jupiterMesh,
+    positionX: jupiterRadius + 0.5,
+    texture: 'textures/callisto.jpg'
+});
+export const jupiterCallistoMesh = jupiterCallisto;
+jupiterLunaOrbitGroup.add(jupiterCallistoMesh);
 
-/// Saturn's moons (x2)
+// Saturn's moons
 export const saturnLunaOrbitGroup = new THREE.Group();
-saturnLunaOrbitGroup.position.x = saturnMesh.position.x;
+saturnLunaOrbitGroup.position.copy(saturnMesh.position);
 
-    // Titan
-    const saturnTitan = new CelestialBody(saturnRadius * 0.128, saturnMesh.position.x, 'textures/titan.jpg');
-    export const saturnTitanMesh = saturnTitan.getMesh();
-    saturnTitanMesh.position.set(saturnRadius + 4, 0, 0);
-    saturnLunaOrbitGroup.add(saturnTitanMesh);
+const saturnTitan = createMoon({
+    radius: saturnRadius * 0.128,
+    parentPlanet: saturnMesh,
+    positionX: saturnRadius + 4,
+    texture: 'textures/titan.jpg'
+});
+export const saturnTitanMesh = saturnTitan;
+saturnLunaOrbitGroup.add(saturnTitanMesh);
 
-    // Rhea
-    const saturnRhea = new CelestialBody(saturnRadius * 0.067, saturnMesh.position.x, 'textures/rhea.jpg');
-    export const saturnRheaMesh = saturnRhea.getMesh();
-    saturnRheaMesh.position.set((saturnRadius + 4.5) * -1, 0, 0);
-    saturnLunaOrbitGroup.add(saturnRheaMesh);
+const saturnRhea = createMoon({
+    radius: saturnRadius * 0.067,
+    parentPlanet: saturnMesh,
+    positionX: -saturnRadius - 4.5,
+    texture: 'textures/rhea.jpg'
+});
+export const saturnRheaMesh = saturnRhea;
+saturnLunaOrbitGroup.add(saturnRheaMesh);
 
-/// Uranus' moons (x2)
+// Uranus' moons
 export const uranusLunaOrbitGroup = new THREE.Group();
-uranusLunaOrbitGroup.position.x = uranusMesh.position.x;
+uranusLunaOrbitGroup.position.copy(uranusMesh.position);
 
-    // Titania
-    const uranusTitania = new CelestialBody(uranusRadius * 0.16, uranusMesh.position.x, 'textures/titania.jpg');
-    export const uranusTitaniaMesh = uranusTitania.getMesh();
-    uranusTitaniaMesh.position.set(uranusRadius + 5, 0, 0);
-    uranusLunaOrbitGroup.add(uranusTitaniaMesh);
+const uranusTitania = createMoon({
+    radius: uranusRadius * 0.16,
+    parentPlanet: uranusMesh,
+    positionX: uranusRadius + 5,
+    texture: 'textures/titania.jpg'
+});
+export const uranusTitaniaMesh = uranusTitania;
+uranusLunaOrbitGroup.add(uranusTitaniaMesh);
 
-    // Oberon
-    const uranusOberon = new CelestialBody(uranusRadius * 0.08, uranusMesh.position.x, 'textures/oberon.jpg');
-    export const uranusOberonMesh = uranusOberon.getMesh();
-    uranusOberonMesh.position.set((uranusRadius + 5.5) * -1, 0, 0);
-    uranusLunaOrbitGroup.add(uranusOberonMesh);
+const uranusOberon = createMoon({
+    radius: uranusRadius * 0.08,
+    parentPlanet: uranusMesh,
+    positionX: -uranusRadius - 5.5,
+    texture: 'textures/oberon.jpg'
+});
+export const uranusOberonMesh = uranusOberon;
+uranusLunaOrbitGroup.add(uranusOberonMesh);
 
-/// Neptune's moons (x2) 
-// Note: Neptune has 14 known moons, but only 2 are shown here 
-// TODO: Add more moons
+// Neptune's moons
 export const neptuneLunaOrbitGroup = new THREE.Group();
 export const neptuneLunaRetrogadeOrbitGroup = new THREE.Group();
-neptuneLunaOrbitGroup.position.x = neptuneMesh.position.x;
-neptuneLunaRetrogadeOrbitGroup.position.x = neptuneMesh.position.x;
+neptuneLunaOrbitGroup.position.copy(neptuneMesh.position);
+neptuneLunaRetrogadeOrbitGroup.position.copy(neptuneMesh.position);
 
-    // Triton
-    const neptuneTriton = new CelestialBody(neptuneRadius * 0.45, neptuneMesh.position.x, 'textures/triton.jpg');
-    export const neptuneTritonMesh = neptuneTriton.getMesh();
-    neptuneTritonMesh.position.set(neptuneRadius + 9, 0, 0);
-    neptuneLunaRetrogadeOrbitGroup.add(neptuneTritonMesh);
+const neptuneTriton = createMoon({
+    radius: neptuneRadius * 0.45,
+    parentPlanet: neptuneMesh,
+    positionX: neptuneRadius + 9,
+    texture: 'textures/triton.jpg'
+});
+export const neptuneTritonMesh = neptuneTriton;
+neptuneLunaRetrogadeOrbitGroup.add(neptuneTritonMesh);
 
-    // Proteus 
-    const neptuneProteus = new CelestialBody(neptuneRadius * 0.17, neptuneMesh.position.x, 'textures/triton.jpg');
-    export const neptuneProteusMesh = neptuneProteus.getMesh();
-    neptuneProteusMesh.position.set((neptuneRadius + 3) * -1, 0, 0);
-    neptuneLunaOrbitGroup.add(neptuneProteusMesh);// Add moons to their respective planets
-
-    // TODO: get textures for Proteus
+const neptuneProteus = createMoon({
+    radius: neptuneRadius * 0.17,
+    parentPlanet: neptuneMesh,
+    positionX: -neptuneRadius - 3,
+    texture: 'textures/proteus.jpg'
+});
+export const neptuneProteusMesh = neptuneProteus;
+neptuneLunaOrbitGroup.add(neptuneProteusMesh);
 
 earthOrbitGroup.add(earthLunaOrbitGroup);
 marsOrbitGroup.add(marsLunaOrbitGroup);
@@ -123,4 +177,3 @@ saturnOrbitGroup.add(saturnLunaOrbitGroup);
 uranusOrbitGroup.add(uranusLunaOrbitGroup);
 neptuneOrbitGroup.add(neptuneLunaOrbitGroup);
 neptuneOrbitGroup.add(neptuneLunaRetrogadeOrbitGroup);
-

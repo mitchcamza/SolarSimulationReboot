@@ -1,5 +1,24 @@
-import { earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh } from './planets.js';
-import { earthLunaOrbitGroup, marsLunaOrbitGroup, jupiterLunaOrbitGroup, saturnLunaOrbitGroup, uranusLunaOrbitGroup, neptuneLunaOrbitGroup, neptuneLunaRetrogadeOrbitGroup, earthLunaMesh, marsPhobosMesh, marsDeimosMesh, jupiterIoMesh, jupiterEuropaMesh, jupiterGanymedeMesh, jupiterCallistoMesh, saturnTitanMesh, saturnRheaMesh, uranusTitaniaMesh, uranusOberonMesh, neptuneTritonMesh, neptuneProteusMesh } from './moons.js';
+import 
+{ 
+    mercuryMesh, mercuryOrbitGroup,
+    venusMesh, venusOrbitGroup,
+    earthMesh, earthOrbitGroup,
+    marsMesh, marsOrbitGroup,
+    jupiterMesh, jupiterOrbitGroup,
+    saturnMesh, saturnOrbitGroup,
+    uranusMesh, uranusOrbitGroup,
+    neptuneMesh, neptuneOrbitGroup  
+} from './planets.js';
+
+import 
+{ 
+    earthLunaMesh, earthLunaOrbitGroup, 
+    marsPhobosMesh, marsDeimosMesh, marsLunaOrbitGroup, 
+    jupiterIoMesh, jupiterEuropaMesh, jupiterGanymedeMesh, jupiterCallistoMesh, jupiterLunaOrbitGroup, 
+    saturnTitanMesh, saturnRheaMesh, saturnLunaOrbitGroup, 
+    uranusTitaniaMesh, uranusOberonMesh,uranusLunaOrbitGroup, 
+    neptuneTritonMesh, neptuneProteusMesh, neptuneLunaOrbitGroup, neptuneLunaRetrogadeOrbitGroup, 
+} from './moons.js';
 
 /**
  * Animation
