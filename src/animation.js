@@ -1,17 +1,40 @@
-import { earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh } from './planets.js';
-import { earthLunaOrbitGroup, marsLunaOrbitGroup, jupiterLunaOrbitGroup, saturnLunaOrbitGroup, uranusLunaOrbitGroup, neptuneLunaOrbitGroup, neptuneLunaRetrogadeOrbitGroup, earthLunaMesh, marsPhobosMesh, marsDeimosMesh, jupiterIoMesh, jupiterEuropaMesh, jupiterGanymedeMesh, jupiterCallistoMesh, saturnTitanMesh, saturnRheaMesh, uranusTitaniaMesh, uranusOberonMesh, neptuneTritonMesh, neptuneProteusMesh } from './moons.js';
+import { MathUtils } from 'three';
+
+import 
+{ 
+    mercury, mercuryOrbitGroup,
+    venus, venusOrbitGroup,
+    earth, earthOrbitGroup,
+    mars, marsOrbitGroup,
+    jupiter, jupiterOrbitGroup,
+    saturn, saturnOrbitGroup,
+    uranus, uranusOrbitGroup,
+    neptune, neptuneOrbitGroup  
+} from './planets.js';
+
+import 
+{ 
+    earthLunaMesh, earthLunaOrbitGroup, 
+    marsPhobosMesh, marsDeimosMesh, marsLunaOrbitGroup, 
+    jupiterIoMesh, jupiterEuropaMesh, jupiterGanymedeMesh, jupiterCallistoMesh, jupiterLunaOrbitGroup, 
+    saturnTitanMesh, saturnRheaMesh, saturnLunaOrbitGroup, 
+    uranusTitaniaMesh, uranusOberonMesh,uranusLunaOrbitGroup, 
+    neptuneTritonMesh, neptuneProteusMesh, neptuneLunaOrbitGroup, neptuneLunaRetrogadeOrbitGroup, 
+} from './moons.js';
 
 /**
  * Animation
  */
+
+// TODO: remove magic numbers
 /**
  * Updates the positions of the moons based on the elapsed time and speed.
  * 
  * @param {number} elapsedTime - The elapsed time in seconds.
  * @param {number} speed - The speed factor.
  */
-export function updateMoons(elapsedTime, speed) {
-
+export function updateMoons(elapsedTime, speed) 
+{
     // Update moons based on their orbital speed
     earthLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
     marsLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
@@ -36,17 +59,32 @@ export function updateMoons(elapsedTime, speed) {
     neptuneTritonMesh.rotation.y = elapsedTime * speed / (-0.0748);
     neptuneProteusMesh.rotation.y = elapsedTime * speed / (0.0748);
 }
-export function updatePlanets(elapsedTime, speed) {
 
+// DEBUG
+console.log(mercury.axialTilt);
+console.log(MathUtils.degToRad(0.034));
+console.log(MathUtils.degToRad(mercury.axialTilt));
+
+// TODO: remove magic numbers
+export function updatePlanets(elapsedTime, speed) 
+{
     // Spin planets based on their axial tilt
-    mercuryMesh.rotation.y = elapsedTime * speed / (0.01);
-    venusMesh.rotation.y = elapsedTime * speed / (-0.01); // venus spins in the opposite direction
-    earthMesh.rotation.y = elapsedTime * speed / (1);
-    marsMesh.rotation.y = elapsedTime * speed / (1.03);
-    jupiterMesh.rotation.y = elapsedTime * speed / (0.41);
-    saturnMesh.rotation.y = elapsedTime * speed / (0.43);
-    uranusMesh.rotation.y = elapsedTime * speed / (0.72);
-    neptuneMesh.rotation.y = elapsedTime * speed / (0.67);
+    mercury.rotation.x = MathUtils.degToRad(0.034);
+    venus.rotation.x = MathUtils.degToRad(177.4);
+    earth.rotation.x = MathUtils.degToRad(23.5);
+    mars.rotation.x = MathUtils.degToRad(25.2);
+    jupiter.rotation.x = MathUtils.degToRad(3.1);
+    saturn.rotation.x = MathUtils.degToRad(26.7);
+    uranus.rotation.x = MathUtils.degToRad(97.8);
+    neptune.rotation.x = MathUtils.degToRad(28.3);
+
+    venus.rotation.y = elapsedTime * speed / (-0.01); 
+    earth.rotation.y = elapsedTime * speed / (1);
+    mars.rotation.y = elapsedTime * speed / (1.03);
+    jupiter.rotation.y = elapsedTime * speed / (0.41);
+    saturn.rotation.y = elapsedTime * speed / (0.43);
+    uranus.rotation.y = elapsedTime * speed / (0.72);
+    neptune.rotation.y = elapsedTime * speed / (0.67);
 
     // Update planets based on their orbital speed
     mercuryOrbitGroup.rotation.y = elapsedTime * speed / (0.24);
