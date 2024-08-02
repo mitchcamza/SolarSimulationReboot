@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+
 // Textures
 const colorTexture = new THREE.TextureLoader().load('textures/2k_sun.jpg');
 colorTexture.colorSpace = THREE.SRGBColorSpace;

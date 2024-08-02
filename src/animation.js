@@ -27,9 +27,14 @@ import
  */
 
 // TODO: remove magic numbers
+/**
+ * Updates the positions of the moons based on the elapsed time and speed.
+ * 
+ * @param {number} elapsedTime - The elapsed time in seconds.
+ * @param {number} speed - The speed factor.
+ */
 export function updateMoons(elapsedTime, speed) 
 {
-
     // Update moons based on their orbital speed
     earthLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
     marsLunaOrbitGroup.rotation.y = elapsedTime * speed / (0.0748);
@@ -63,7 +68,6 @@ console.log(MathUtils.degToRad(mercury.axialTilt));
 // TODO: remove magic numbers
 export function updatePlanets(elapsedTime, speed) 
 {
-
     // Spin planets based on their axial tilt
     mercury.rotation.x = MathUtils.degToRad(0.034);
     venus.rotation.x = MathUtils.degToRad(177.4);
