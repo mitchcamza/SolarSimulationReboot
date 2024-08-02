@@ -165,7 +165,7 @@ const neptuneProteus = createMoon({
     radius: neptuneRadius * 0.17,
     parentPlanet: neptuneMesh,
     positionX: -neptuneRadius - 3,
-    texture: 'textures/proteus.jpg'
+    texture: 'textures/triton.jpg'
 });
 export const neptuneProteusMesh = neptuneProteus;
 neptuneLunaOrbitGroup.add(neptuneProteusMesh);

@@ -130,8 +130,6 @@ window.addEventListener('dblclick', () =>
  */
 const solarSystemGroup = new THREE.Group();
 solarSystemGroup.add(sunMesh);
-console.log('sunMesh', sunMesh);
-console.log('solarSystemGroup', solarSystemGroup);
 
 // Add planet orbit groups to solar system
 solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);

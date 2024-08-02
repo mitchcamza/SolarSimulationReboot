@@ -5,7 +5,6 @@ const sunRadius = 10;
 export const sunlightColor = new THREE.Color(0xffe7ba);
 const colorTexture = new THREE.TextureLoader().load('textures/2k_sun.jpg');
 colorTexture.colorSpace = THREE.SRGBColorSpace;
-console.log(colorTexture)
 export const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(sunRadius, 32, 32), new THREE.MeshBasicMaterial({ map: colorTexture }));
 
 // Modify material to be emissive
