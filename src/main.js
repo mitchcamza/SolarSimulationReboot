@@ -27,23 +27,26 @@ const aspect = { width: window.innerWidth, height: window.innerHeight };
  * Scene
  */
 const scene = new THREE.Scene();
-scene.scale.set(10, 10, 10);
+// scene.scale.set(10, 10, 10);
 
-// Frame rate monitor
+/**
+ * Performance stats
+ */
 const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
 
-// Axes helper
+/**
+ * Helpers
+ */
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
-// Grid helper
 const gridHelper = new THREE.GridHelper(650, 650);
 scene.add(gridHelper);
 
-/** 
- * Environment Map
+/**
+ * Environment map
  */
 const environmentMap = environmentMapTextureLoader.load([
     '/environmentMaps/skybox/right.png',
@@ -74,7 +77,7 @@ scene.add(ambientLight);
 /**
  * Camera
  */
-const camera = new THREE.PerspectiveCamera(45, aspect.width / aspect.height, 0.1, 5000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(-76, 28, 70);
 scene.add(camera);
 
@@ -82,10 +85,10 @@ scene.add(camera);
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, physicallyCorrectLights: true });
-renderer.setSize(aspect.width, aspect.height);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.castShadow = true;
 
-// Handle windows resize for responsiveness
+// Handle window resize for responsiveness
 window.addEventListener('resize', () =>
 {
     // Update the aspect ratio on resize
@@ -93,20 +96,18 @@ window.addEventListener('resize', () =>
     aspect.height = window.innerHeight;
 
     // Update the camera
-    camera.aspect = aspect.width / aspect.height;
+    camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
     // Update the renderer
     renderer.setSize(aspect.width, aspect.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.render(scene, camera);
 });
 
 // Handle fullscreen
 window.addEventListener('dblclick', () =>
 {
     const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
-
     if (!fullscreenElement)
     {
         canvas.requestFullscreen();
@@ -125,10 +126,8 @@ window.addEventListener('dblclick', () =>
 });
 
 /**
- * Groups
+ * Orbital Groups
  */
-
-// Create a group for the solar system and add the sun to the group
 const solarSystemGroup = new THREE.Group();
 solarSystemGroup.add(sunMesh);
 console.log('sunMesh', sunMesh);
@@ -144,16 +143,13 @@ scene.add(solarSystemGroup);
 /**
  * Controls
  */
-// TODO: Show controls in fullscreen mode
 const gui = new GUI();
-
-
-// Allow controls to be visible when in fullscreen
-gui.domElement.style.zIndex = 1000;
 
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
+controls.minDistance = 40;
+controls.maxDistance = 300;
 
 // Add light controls to the GUI
 const lightsFolder = gui.addFolder('Lights')
