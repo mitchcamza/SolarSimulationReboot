@@ -4,10 +4,10 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js'
 
 // import sun
-import { sunMesh, sunlightColor } from './sun.js';
+import { sun } from './sun.js';
 
 // Import planets and moons
-import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercuryMesh, venusMesh, earthMesh, marsMesh, jupiterMesh, saturnMesh, uranusMesh, neptuneMesh } from './planets.js';
+import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './planets.js';
 
 // Import animation functions
 import { updatePlanets, updateMoons } from './animation.js';
@@ -64,11 +64,13 @@ scene.background = environmentMap
  * Lights
  */
 
+const sunlightColor = new THREE.Color(0xffe7ba);
+
 // Point light
 const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
-pointLight.position.copy(sunMesh.position);
+pointLight.position.copy(sun.position);
 pointLight.castShadow = true;
-sunMesh.add(pointLight);
+sun.add(pointLight);
 
 // Ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
@@ -129,7 +131,7 @@ window.addEventListener('dblclick', () =>
  * Orbital Groups
  */
 const solarSystemGroup = new THREE.Group();
-solarSystemGroup.add(sunMesh);
+solarSystemGroup.add(sun);
 
 // Add planet orbit groups to solar system
 solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
@@ -177,7 +179,7 @@ cameraFolder.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z
 // Reset camera position
 cameraFolder.add({ Reset: () => {
     camera.position.set(-10, 133, 110);
-    camera.lookAt(sunMesh.position);
+    camera.lookAt(sun.position);
 } }, 'Reset').name('Reset');
 
 cameraFolder.close();
