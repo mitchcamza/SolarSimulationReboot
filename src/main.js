@@ -170,97 +170,100 @@ lightsFolder
     .name('Ambient Light Intensity')
     .listen();
 
-// Camera position controls
-const cameraFolder = gui.addFolder('Camera');
-cameraFolder.add(controls, 'enabled').name('Orbit Controls');
-cameraFolder.add(camera.position, 'x').min(-500).max(500).step(0.1).name('Move X').listen();
-cameraFolder.add(camera.position, 'y').min(-500).max(500).step(0.1).name('Move Y').listen();
-cameraFolder.add(camera.position, 'z').min(-500).max(500).step(0.1).name('Move Z').listen();
+lightsFolder.close();
 
-// Reset camera position
-cameraFolder.add({ Reset: () => {
-    camera.position.set(-10, 133, 110);
-    camera.lookAt(sun.position);
-} }, 'Reset').name('Reset');
+// Create the GUI and add the "Follow" folder
+let followFolder = gui.addFolder('Follow');
+console.log("Created Follow folder: ", followFolder);
 
-cameraFolder.close();
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let selectedObject = null;
+let objectToFollow = null;
+
+// Handle mouse click events
+function onMouseClick(event)
+{
+    // Calculate mouse position
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;      // Normalize the x position
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;    // Normalize the y position
+
+    // Update the picking ray with the camera and mouse position
+    raycaster.setFromCamera(mouse, camera);
+
+    // Calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    // Check if the object is a celestial body
+    if (intersects.length > 0)
+    {
+        // Get the first intersected object
+        const clickedObject = intersects[0].object;
+
+        // Check if the object is a celestial body
+        if (clickedObject.parent && clickedObject.parent.userData)
+        {
+            // Get the celestial body name
+            const celestialName = clickedObject.parent.userData.name;
+
+            // Find the celestial body in the GUI
+            const celestial = gui.__folders.Follow.__controllers.find((controller) => controller.property === `Follow${celestialName}`);
+
+            // Focus the camera on the celestial body
+            if (celestial) 
+            { 
+                celestial.__li.click() 
+            };
+
+            if (selectedObject !== clickedObject)
+            {
+                selectedObject = clickedObject;
+                focusOnObject(selectedObject);
+            }
+        }
+    }
+}
+window.addEventListener('click', onMouseClick);
+
+// Focus the camera on the selected object
+function focusOnObject(object)
+{
+    const objectPosition = new THREE.Vector3();
+    if (!object.isMesh) { return; }
+    const cameraOffset = new THREE.Vector3(30, 30, object.geometry.parameters.radius);
+    object.getWorldPosition(objectPosition);
+
+    gsap.to(camera.position, {
+        duration: 2,
+        x: objectPosition.x + cameraOffset.x,
+        y: objectPosition.y + cameraOffset.y,
+        z: objectPosition.z + cameraOffset.z,
+        ease: 'power2.inOut',
+        onUpdate: () => { camera.lookAt(objectPosition); },
+        onComplete: () => { controls.target.copy(objectPosition); }
+    });
+
+    objectToFollow = object;
+    console.log("Focussing on object: ", object);
+}
 
 // Add a list of planet names to the GUI
-const celestials = ['Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
-const followFolder = gui.addFolder('Follow');
+const celestials = []
+const celestialNames = ['Sun'].concat(planetData.map((planet) => planet.name));
+celestials.push(sun);
+planetData.forEach((planet) => { celestials.push(planet.mesh); });
+console.log("celestials: ", celestialNames);
+// const followFolder = gui.addFolder('Follow');
 
-// Add a button for each planet to focus the camera on the planet
-celestials.forEach((celestial) => {
+// Add a "Follow" button for each celestial body
+celestialNames.forEach((celestial) => {
     followFolder.add({ [`Follow${celestial}`]: () => {
-        const offset = new THREE.Vector3(0, 0, 50); // Set the offset distance from the target
-        const targetPosition = eval(`${celestial.toLowerCase()}Mesh`).position.clone().add(offset); // Calculate the target position with offset
-        camera.position.copy(targetPosition);
-        camera.lookAt(eval(`${celestial.toLowerCase()}Mesh`).position);
+        focusOnObject(celestials[celestialNames.indexOf(celestial)]);
     }
     }, `Follow${celestial}`).name(celestial);
 });
-followFolder.close();
-
-// Handle planet click event
-/**
- * Handles the click event on a planet.
- * @param {string} name - The name of the planet that was clicked.
- */
-function handlePlanetClick(name) {
-    let planetMesh;
-    // Determine which planet was clicked and get its corresponding Three.js mesh
-    switch(name) {
-        case 'Mercury':
-            planetMesh = mercuryMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Venus':
-            planetMesh = venusMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Earth':
-            planetMesh = earthMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Mars':
-            planetMesh = marsMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Jupiter':
-            planetMesh = jupiterMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Saturn':
-            planetMesh = saturnMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Uranus':
-            planetMesh = uranusMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        case 'Neptune':
-            planetMesh = neptuneMesh;
-            console.log('Clicked on', planetMesh.name)
-            break;
-        default:
-            console.error('Invalid planet name:', name);
-            return;
-    }
-
-    // Focus the camera on the selected planet
-    focusCameraOnObject(planetMesh);
-}
-
-// Function to focus the camera on a specific object
-function focusCameraOnObject(object) {
-    // Calculate the position to focus the camera on
-    const targetPosition = object.position.clone();
-    // Animate the camera's position to focus on the target position
-    new TWEEN.Tween(camera.position)
-        .to(targetPosition.clone().add(new THREE.Vector3(0, 10, 30)), 1000) // Example offset for better view
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .start();
-}
+followFolder.open();
 
 // Speed controls for planets and moons
 const speedFolder = gui.addFolder('Speed');
@@ -368,6 +371,24 @@ const tick = () =>
     // Update planets and moons
     updatePlanets(elapsedTime, speed);
     updateMoons(elapsedTime, speed);
+
+    // DEBUG
+    // console log mercury's updated position each frame
+
+    // Update camera position to follow selected planet
+    if (objectToFollow) 
+    {
+        const objectPosition = new THREE.Vector3();
+        objectToFollow.getWorldPosition(objectPosition);
+        camera.position.lerp(objectPosition.clone().add(new THREE.Vector3(30, 30, objectToFollow.geometry.parameters.radius)), 0.10); 
+        camera.lookAt(objectPosition);
+        controls.target.copy(objectPosition);
+    }
+
+    // console.log("Camera position: ", camera.position);
+
+    // Update controls
+    controls.update();
 
     // Update the renderer
     renderer.render(scene, camera);
