@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 
-function createPlanet({ radius, positionX, textures = {}, emissiveColor = null }) 
+function createPlanet({ name = null, radius, positionX, textures = {}, axialTilt = null, emissiveColor = null }) 
 {
-    const geometry = new THREE.SphereGeometry(radius, 64, 64);
+    const geometry = new THREE.SphereGeometry(radius, 32, 32);
     const materialConfig = {
         bumpScale: 3.0,
         metalness: 0.1,
@@ -44,101 +44,81 @@ function createPlanet({ radius, positionX, textures = {}, emissiveColor = null }
     return mesh;
 }
 
-// Mercury
-export const mercury = createPlanet({
-    radius: 0.38,
-    positionX: 25,
-    textures: {
-        color: 'textures/2k_mercury.jpg'
+// Store the planets in an array
+export const planetData = [
+    { 
+        name: 'Mercury', 
+        radius: 0.38, 
+        positionX: 25, 
+        textures: { color: 'textures/2k_mercury.jpg' },
+        axialTilt: 0.034,
     },
-    axialTilt: 0.034,
-});
-export let mercuryOrbitGroup = new THREE.Group();
-mercuryOrbitGroup.add(mercury);
+    { 
+        name: 'Venus', 
+        radius: 0.95, 
+        positionX: 40, 
+        textures: { color: 'textures/2k_venus_atmosphere.jpg' },
+        axialTilt: 177.4,
+    },
+    { 
+        name: 'Earth', 
+        radius: 1, 
+        positionX: 55, 
+        textures: { 
+            color: 'textures/2k_earth_daymap.jpg',
+            bump: 'textures/8081_earthbump4k.jpg',
+            metalness: 'textures/8081_earthspec4k.jpg'
+        },
+        axialTilt: 23.5,
+    },
+    { 
+        name: 'Mars', 
+        radius: 0.53, 
+        positionX: 70, 
+        textures: { color: 'textures/2k_mars.jpg' },
+        axialTilt: 25.2,
+    },
+    { 
+        name: 'Jupiter', 
+        radius: 3.5, 
+        positionX: 100, 
+        textures: { color: 'textures/2k_jupiter.jpg' },
+        emissiveColor: 0x1a1a1a,
+        axialTilt: 3.1,
+    },
+    { 
+        name: 'Saturn', 
+        radius: 3, 
+        positionX: 130, 
+        textures: { color: 'textures/2k_saturn.jpg' },
+        axialTilt: 26.7,
+    },
+    { 
+        name: 'Uranus', 
+        radius: 1.25, 
+        positionX: 160, 
+        textures: { color: 'textures/2k_uranus.jpg' },
+        axialTilt: 97.8,
+    },
+    { 
+        name: 'Neptune', 
+        radius: 1.2, 
+        positionX: 190, 
+        textures: { color: 'textures/2k_neptune.jpg' },
+        axialTilt: 28.3,
+    },
+];
 
-// Venus
-export const venus = createPlanet({
-    radius: 0.95,
-    positionX: 40,
-    textures: {
-        color: 'textures/2k_venus_atmosphere.jpg'
-    },
-    axialTilt: 177.4,
-});
-export let venusOrbitGroup = new THREE.Group();
-venusOrbitGroup.add(venus);
+// Store planets and orbit groups in separate arrays
+export const planets = [];
+export const orbitalGroups = [];
 
-// Earth
-export const earth = createPlanet({
-    radius: 1,
-    positionX: 55,
-    textures: {
-        color: 'textures/2k_earth_daymap.jpg',
-        bump: 'textures/8081_earthbump4k.jpg',
-        metalness: 'textures/8081_earthspec4k.jpg'
-    },
-    axialTilt: 23.5,
-});
-export let earthOrbitGroup = new THREE.Group();
-earthOrbitGroup.add(earth);
+planetData.forEach((planet) => { 
+    const planetMesh = createPlanet(planet);
+    planet.mesh = planetMesh;
+    planets.push(planetMesh);
 
-// Mars
-export const mars = createPlanet({
-    radius: 0.53,
-    positionX: 70,
-    textures: {
-        color: 'textures/2k_mars.jpg'
-    },
-    axialTilt: 25.2,
+    const orbitGroup = new THREE.Group();
+    orbitGroup.add(planetMesh);
+    orbitalGroups.push(orbitGroup);
 });
-export let marsOrbitGroup = new THREE.Group();
-marsOrbitGroup.add(mars);
-
-// Jupiter
-export const jupiter = createPlanet({
-    radius: 3.5,
-    positionX: 100,
-    textures: {
-        color: 'textures/2k_jupiter.jpg'
-    },
-    emissiveColor: 0x1a1a1a,
-    axialTilt: 3.1,
-});
-export let jupiterOrbitGroup = new THREE.Group();
-jupiterOrbitGroup.add(jupiter);
-
-// Saturn
-export const saturn = createPlanet({
-    radius: 3,
-    positionX: 130,
-    textures: {
-        color: 'textures/2k_saturn.jpg'
-    },
-    axialTilt: 26.7,
-});
-export let saturnOrbitGroup = new THREE.Group();
-saturnOrbitGroup.add(saturn);
-
-// Uranus
-export const uranus = createPlanet({
-    radius: 1.25,
-    positionX: 160,
-    textures: {
-        color: 'textures/2k_uranus.jpg'
-    },
-    axialTilt: 97.8,
-});
-export let uranusOrbitGroup = new THREE.Group();
-uranusOrbitGroup.add(uranus);
-
-// Neptune
-export const neptune = createPlanet({
-    radius: 1.2,
-    positionX: 190,
-    textures: {
-        color: 'textures/2k_neptune.jpg'
-    },
-    axialTilt: 28.3,
-});
-export let neptuneOrbitGroup = new THREE.Group();
-neptuneOrbitGroup.add(neptune);
