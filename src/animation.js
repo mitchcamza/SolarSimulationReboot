@@ -1,16 +1,7 @@
 import { MathUtils } from 'three';
 
-import 
-{ 
-    mercury, mercuryOrbitGroup,
-    venus, venusOrbitGroup,
-    earth, earthOrbitGroup,
-    mars, marsOrbitGroup,
-    jupiter, jupiterOrbitGroup,
-    saturn, saturnOrbitGroup,
-    uranus, uranusOrbitGroup,
-    neptune, neptuneOrbitGroup  
-} from './planets.js';
+import { planets, orbitalGroups } from './planets.js';
+
 
 import 
 { 
@@ -61,38 +52,38 @@ export function updateMoons(elapsedTime, speed)
 }
 
 // DEBUG
-console.log(mercury.axialTilt);
-console.log(MathUtils.degToRad(0.034));
-console.log(MathUtils.degToRad(mercury.axialTilt));
+// console.log(mercury.axialTilt);
+// console.log(MathUtils.degToRad(0.034));
+// console.log(MathUtils.degToRad(mercury.axialTilt));
 
 // TODO: remove magic numbers
 export function updatePlanets(elapsedTime, speed) 
 {
     // Spin planets based on their axial tilt
-    mercury.rotation.x = MathUtils.degToRad(0.034);
-    venus.rotation.x = MathUtils.degToRad(177.4);
-    earth.rotation.x = MathUtils.degToRad(23.5);
-    mars.rotation.x = MathUtils.degToRad(25.2);
-    jupiter.rotation.x = MathUtils.degToRad(3.1);
-    saturn.rotation.x = MathUtils.degToRad(26.7);
-    uranus.rotation.x = MathUtils.degToRad(97.8);
-    neptune.rotation.x = MathUtils.degToRad(28.3);
+    planets[0].rotation.x = MathUtils.degToRad(0.034);
+    planets[1].rotation.x = MathUtils.degToRad(177.4);
+    planets[2].rotation.x = MathUtils.degToRad(23.5);
+    planets[3].rotation.x = MathUtils.degToRad(25.2);
+    planets[4].rotation.x = MathUtils.degToRad(3.1);
+    planets[5].rotation.x = MathUtils.degToRad(26.7);
+    planets[6].rotation.x = MathUtils.degToRad(97.8);
+    planets[7].rotation.x = MathUtils.degToRad(28.3);
 
-    venus.rotation.y = elapsedTime * speed / (-0.01); 
-    earth.rotation.y = elapsedTime * speed / (1);
-    mars.rotation.y = elapsedTime * speed / (1.03);
-    jupiter.rotation.y = elapsedTime * speed / (0.41);
-    saturn.rotation.y = elapsedTime * speed / (0.43);
-    uranus.rotation.y = elapsedTime * speed / (0.72);
-    neptune.rotation.y = elapsedTime * speed / (0.67);
+    planets[1].rotation.y = elapsedTime * speed / (-0.01); 
+    planets[2].rotation.y = elapsedTime * speed / (1);
+    planets[3].rotation.y = elapsedTime * speed / (1.03);
+    planets[4].rotation.y = elapsedTime * speed / (0.41);
+    planets[5].rotation.y = elapsedTime * speed / (0.43);
+    planets[6].rotation.y = elapsedTime * speed / (0.72);
+    planets[7].rotation.y = elapsedTime * speed / (0.67);
 
     // Update planets based on their orbital speed
-    mercuryOrbitGroup.rotation.y = elapsedTime * speed / (0.24);
-    venusOrbitGroup.rotation.y = elapsedTime * speed / (0.62);
-    earthOrbitGroup.rotation.y = elapsedTime * speed / (1);
-    marsOrbitGroup.rotation.y = elapsedTime * speed / (1.88);
-    jupiterOrbitGroup.rotation.y = elapsedTime * speed / (11.86);
-    saturnOrbitGroup.rotation.y = elapsedTime * speed / (29.46);
-    uranusOrbitGroup.rotation.y = elapsedTime * speed / (84.01);
-    neptuneOrbitGroup.rotation.y = elapsedTime * speed / (164.8);
+    orbitalGroups[0].rotation.y = elapsedTime * speed / (0.24);
+    orbitalGroups[1].rotation.y = elapsedTime * speed / (0.62);
+    orbitalGroups[2].rotation.y = elapsedTime * speed / (1);
+    orbitalGroups[3].rotation.y = elapsedTime * speed / (1.88);
+    orbitalGroups[4].rotation.y = elapsedTime * speed / (11.86);
+    orbitalGroups[5].rotation.y = elapsedTime * speed / (29.46);
+    orbitalGroups[6].rotation.y = elapsedTime * speed / (84.01);
+    orbitalGroups[7].rotation.y = elapsedTime * speed / (164.8);
 }

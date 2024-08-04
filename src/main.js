@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'lil-gui';
 import Stats from 'stats.js'
+import gsap from 'gsap';
+
 
 // import sun
 import { sun } from './sun.js';
 
-// Import planets and moons
-import { earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup, mercuryOrbitGroup, venusOrbitGroup, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune } from './planets.js';
+// Import planets and orbital groups
+import { planetData, orbitalGroups } from './planets.js';
 
 // Import animation functions
 import { updatePlanets, updateMoons } from './animation.js';
@@ -27,7 +29,6 @@ const aspect = { width: window.innerWidth, height: window.innerHeight };
  * Scene
  */
 const scene = new THREE.Scene();
-// scene.scale.set(10, 10, 10);
 
 /**
  * Performance stats
@@ -133,8 +134,8 @@ window.addEventListener('dblclick', () =>
 const solarSystemGroup = new THREE.Group();
 solarSystemGroup.add(sun);
 
-// Add planet orbit groups to solar system
-solarSystemGroup.add(mercuryOrbitGroup, venusOrbitGroup, earthOrbitGroup, marsOrbitGroup, jupiterOrbitGroup, saturnOrbitGroup, uranusOrbitGroup, neptuneOrbitGroup);
+// Add planet orbit groups to solar system group
+orbitalGroups.forEach((group) => { solarSystemGroup.add(group); });
 
 // Add solar system to scene
 scene.add(solarSystemGroup);
