@@ -8,8 +8,9 @@ import { planets, orbitalGroups } from './planets.js';
 
 function createMoon({ radius, parentPlanet, positionX, texture }) 
 {
-    const geometry = new THREE.SphereGeometry(radius, 32, 32);
-    const material = new THREE.MeshStandardMaterial({
+    const geometry = new THREE.SphereGeometry(radius, 32, 32);    
+    const material = new THREE.MeshStandardMaterial(
+    {
         map: new THREE.TextureLoader().load(texture)
     });
     material.map.colorSpace = THREE.SRGBColorSpace;
@@ -28,7 +29,7 @@ const earthRadius = Math.abs(planets[2].geometry.parameters.radius);
 const earthLuna = createMoon({
     radius: earthRadius * 0.273,
     parentPlanet: planets[2],
-    positionX: planets[2].radius + 1,
+    positionX: earthRadius + 1.5,
     texture: 'textures/2k_moon.jpg'
 });
 export const earthLunaMesh = earthLuna;

@@ -57,7 +57,6 @@ const environmentMap = environmentMapTextureLoader.load([
     '/environmentMaps/skybox/front.png',
     '/environmentMaps/skybox/back.png'
 ])
-scene.environment = environmentMap
 scene.background = environmentMap
 
 
@@ -174,7 +173,7 @@ lightsFolder.close();
 
 // Create the GUI and add the "Follow" folder
 let followFolder = gui.addFolder('Follow');
-console.log("Created Follow folder: ", followFolder);
+followFolder.name = 'Follow';
 
 // Raycaster
 const raycaster = new THREE.Raycaster();
@@ -206,10 +205,9 @@ function onMouseClick(event)
         {
             // Get the celestial body name
             const celestialName = clickedObject.parent.userData.name;
-
-            // Find the celestial body in the GUI
-            const celestial = gui.__folders.Follow.__controllers.find((controller) => controller.property === `Follow${celestialName}`);
-
+            
+            const celestial = followFolder.controllers.find((controller) => controller.property === `Follow${celestialName}`);
+            
             // Focus the camera on the celestial body
             if (celestial) 
             { 
@@ -245,7 +243,6 @@ function focusOnObject(object)
     });
 
     objectToFollow = object;
-    console.log("Focussing on object: ", object);
 }
 
 // Add a list of planet names to the GUI
@@ -253,8 +250,6 @@ const celestials = []
 const celestialNames = ['Sun'].concat(planetData.map((planet) => planet.name));
 celestials.push(sun);
 planetData.forEach((planet) => { celestials.push(planet.mesh); });
-console.log("celestials: ", celestialNames);
-// const followFolder = gui.addFolder('Follow');
 
 // Add a "Follow" button for each celestial body
 celestialNames.forEach((celestial) => {
@@ -372,9 +367,6 @@ const tick = () =>
     updatePlanets(elapsedTime, speed);
     updateMoons(elapsedTime, speed);
 
-    // DEBUG
-    // console log mercury's updated position each frame
-
     // Update camera position to follow selected planet
     if (objectToFollow) 
     {
@@ -385,10 +377,11 @@ const tick = () =>
         controls.target.copy(objectPosition);
     }
 
-    // console.log("Camera position: ", camera.position);
-
     // Update controls
     controls.update();
+
+    // Update shader time uniform
+    sun.material.uniforms.uTime.value = elapsedTime;
 
     // Update the renderer
     renderer.render(scene, camera);
