@@ -69,26 +69,35 @@ const sunlightColor = new THREE.Color(0xffe7ba);
 // Point light
 const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
 pointLight.position.copy(sun.position);
-pointLight.castShadow = true;
 sun.add(pointLight);
 
 // Ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-scene.add(ambientLight);
+// scene.add(ambientLight);
 
 /**
  * Camera
  */
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-76, 28, 70);
+export const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.lookAt(0, 0, 0);
 scene.add(camera);
 
 /**
  * Renderer
  */
-const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, physicallyCorrectLights: true });
+// Renderer
+const renderer = new THREE.WebGLRenderer({ 
+    canvas: canvas, 
+    antialias: true, 
+    physicallyCorrectLights: true, 
+    powerPreference: "high-performance", 
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.castShadow = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ReinhardToneMapping;
+renderer.toneMappingExposure = 2.3;
 
 // Handle window resize for responsiveness
 window.addEventListener('resize', () =>
@@ -148,7 +157,7 @@ const gui = new GUI();
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-controls.minDistance = 40;
+controls.minDistance = 30;
 controls.maxDistance = 300;
 
 // Add light controls to the GUI
@@ -349,6 +358,10 @@ performanceFolder.add({ ShowStats: true }, 'ShowStats').name('Show stats').onCha
     else { stats.showPanel(-1); }
 });
 performanceFolder.close();
+
+
+// Set camera position based on sun radius
+camera.position.set(-76, 28, sun.geometry.parameters.radius * 10);
 
 
 // Clock
