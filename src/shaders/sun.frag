@@ -1,3 +1,11 @@
+/**
+* @file sun.frag
+* @brief Fragment shader for the sun
+* @details This shader is used to render the sun. It uses a combination of fractal brownian motion and contrast to create a noise effect on the sun. The noise is then used to blend between two colours to create a dynamic sun texture.
+* @author Mitch Campbell
+* @note This shader is based on the work of Ian McEwan, Ashima Arts, and Stefan Gustavson. It is a modified version of the GLSL simplex noise functions by Stefan Gustavson.
+*/
+
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex 
 //               noise functions.
@@ -10,13 +18,18 @@
 //               https://github.com/stegu/webgl-noise
 // 
 
+#define PI 3.14159265358979
+
 
 precision mediump float;
 
 uniform float uTime;
+uniform float uScatteringIntensity;
+uniform vec3 uCameraPosition;
 
 varying vec2 vUv;
 varying vec3 vPosition;
+varying vec3 vNormal;
 
 vec4 mod289(vec4 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -150,9 +163,10 @@ float fbm(vec4 p)
   float scale = 1.0;
   float persistence = 0.9; // Persistence factor
   float lacunarity = 2.0; // Lacunarity factor
+  const int octaves = 4;
 
   // Loop through octaves
-  for (int i = 0; i < 8; i++) 
+  for (int i = 0; i < octaves; i++) 
   {
     sum += snoise(p * scale) * amplitude;
     p.w += 100.0;
@@ -174,6 +188,29 @@ float contrast(float val, float factor)
   return (val - 0.5) * factor + 0.5;
 }
 
+/**
+* @brief Rayleigh Phase function
+* @author Mitch Campbell
+* @param lightDir Light direction
+* @param viewDir View direction
+* @return Rayleigh phase
+*/
+vec3 rayleighPhase(vec3 lightDir, vec3 viewDir) 
+{
+    float cosTheta = dot(lightDir, viewDir);
+    return vec3(3.0 / (16.0 * PI)) * (1.0 + cosTheta * cosTheta);
+}
+
+/**
+* @brief Implement a tone mapping function for HDR lighting
+* @author Mitch Campbell
+* @param color Colour
+* @return Tone mapped colour
+*/
+vec3 toneMap(vec3 color) 
+{
+    return color / (color + vec3(1.0));
+}
 
 /**
 * @brief Main function for the sun fragment shader
@@ -181,9 +218,11 @@ float contrast(float val, float factor)
 */
 void main() 
 {
+    vec3 viewDirection = normalize(uCameraPosition - vPosition);
+    
     // Noise
     vec4 p1 = vec4(vPosition * 0.2, uTime * 0.2);
-    vec4 p2 = vec4(vPosition * 2.0, uTime * 0.12);
+    vec4 p2 = vec4(vPosition * 2.0, uTime * 0.4);
     float baseNoise = fbm(p1);
     float detailNoise = fbm(p2);
     float combinedNoise = mix(baseNoise, detailNoise, 0.5);  
@@ -194,6 +233,14 @@ void main()
     vec3 color2 = vec3(1.0, 1.0, 0.0); 
     vec3 finalColor = mix(color1, color2, combinedNoise);
 
+    // Scattering Effect
+    vec3 scattering = rayleighPhase(normalize(vPosition), viewDirection);
+    finalColor += scattering * uScatteringIntensity;
+
+    // Fresnel Effect
+    float fresnel = pow(1.0 - dot(vNormal, viewDirection), 1.0);
+    finalColor += fresnel * vec3(1.0) * 0.5;
+
     // Apply the noise to the sun texture color
-    gl_FragColor = vec4(finalColor, 1.0);
+    gl_FragColor = vec4(toneMap(finalColor), 1.0);
 }
