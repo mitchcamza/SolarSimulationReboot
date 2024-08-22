@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import vertexShader from './shaders/sun.vert';
-import fragmentShader from './shaders/sun.frag';
-import glowFragmentShader from './shaders/glow.frag'
+import vertexShader from './shaders/sun/sun.vert';
+import fragmentShader from './shaders/sun/sun.frag';
+import glowFragmentShader from './shaders/sun/glow.frag'
 
 
 // Sun Material
-const sunMaterial = new THREE.RawShaderMaterial({
+export const sunMaterial = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
     uniforms:
@@ -13,6 +13,7 @@ const sunMaterial = new THREE.RawShaderMaterial({
         uTime: { value: 0.0 },
         uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         uScatteringIntensity: { value: 0.1 },
+        uCameraPosition: { value: new THREE.Vector3() },
     },
     side: THREE.DoubleSide,
     transparent: true,
@@ -25,7 +26,7 @@ export const sun = new THREE.Mesh(
 );
 
 // Glow Material
-const glowMaterial = new THREE.RawShaderMaterial({
+export const glowMaterial = new THREE.RawShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: glowFragmentShader,
     uniforms: 
@@ -36,13 +37,14 @@ const glowMaterial = new THREE.RawShaderMaterial({
         uOuterRadius: { value: sun.geometry.parameters.radius * 1.2 },
         uGlowColor: { value: new THREE.Color('orange') },
         uGlowIntensity: { value: 1.0 },
+        uCameraPosition: { value: new THREE.Vector3() },
     },
     blending: THREE.AdditiveBlending,
     transparent: true,
 });
 
 const glowMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(sun.geometry.parameters.radius * 1.05, 32, 32),
+    new THREE.SphereGeometry(sun.geometry.parameters.radius * 1.01, 32, 32),
     glowMaterial
 );
 sun.add(glowMesh);
