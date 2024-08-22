@@ -31,22 +31,6 @@ const aspect = { width: window.innerWidth, height: window.innerHeight };
 const scene = new THREE.Scene();
 
 /**
- * Performance stats
- */
-const stats = new Stats();
-stats.showPanel(0);
-document.body.appendChild(stats.dom);
-
-/**
- * Helpers
- */
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
-
-const gridHelper = new THREE.GridHelper(650, 650);
-scene.add(gridHelper);
-
-/**
  * Environment map
  */
 const environmentMap = environmentMapTextureLoader.load([
@@ -67,13 +51,13 @@ scene.background = environmentMap
 const sunlightColor = new THREE.Color(0xffe7ba);
 
 // Point light
-const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
+const pointLight = new THREE.PointLight(sunlightColor, 16000, 1000, 2);
 pointLight.position.copy(sun.position);
 sun.add(pointLight);
 
 // Ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-// scene.add(ambientLight);
+scene.add(ambientLight);
 
 /**
  * Camera
@@ -85,7 +69,6 @@ scene.add(camera);
 /**
  * Renderer
  */
-// Renderer
 const renderer = new THREE.WebGLRenderer({ 
     canvas: canvas, 
     antialias: true, 
@@ -165,7 +148,7 @@ const lightsFolder = gui.addFolder('Lights')
 lightsFolder
     .add(pointLight, 'intensity')
     .min(0)
-    .max(10000)
+    .max(20000)
     .step(1)
     .name('Point Light Intensity')
     .listen()
@@ -290,77 +273,26 @@ speedFolder.add({ Reset: () => {
 } }, 'Reset').name('Reset');
 speedFolder.close();
 
-// Material Folder
-const materialFolder = gui.addFolder('Materials');
-materialFolder.add({ Wireframe: false }, 'Wireframe').name('Wireframe').onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-            object.material.wireframe = value; 
-        }});
-    });
-
-// Toggle MeshNormalMaterial
-materialFolder.add({ Normal: false }, 'Normal').name('Normal').onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) 
-        {
-            if (value) 
-            {
-                object.userData.originalMaterial = object.material;
-                object.material.dispose();
-                if (object.material.wireframe) 
-                {
-                    object.material = new THREE.MeshNormalMaterial({ wireframe: true });
-                } 
-                else 
-                {
-                    object.material = new THREE.MeshNormalMaterial();
-                }
-            } 
-            else 
-            {
-                if (object.userData.originalMaterial) 
-                {
-                    object.material.dispose();
-                    object.material = object.userData.originalMaterial;
-                    delete object.userData.originalMaterial;
-                }
-            }
-        }
-    });
-});
-materialFolder.close();
-
-// Helpers folder
-const helperFolder = gui.addFolder('Helpers');
-helperFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
-helperFolder.close();
-
-// Toggle Axes Helper for all celestial bodies
-helperFolder.add({ AxesHelper: false }, 'AxesHelper').name('Axes Helper').setValue(false).onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-            object.children[0].visible = value; 
-        }});
-    }   
-);
-
-// Add a point light helper
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 2);
-pointLightHelper.visible = false;
-helperFolder.add(pointLightHelper, 'visible').name('Point Light Helper').listen();
-scene.add(pointLightHelper);
-
-// Performance folder
+/**
+ * Performance stats
+ */
+const stats = new Stats();
 const performanceFolder = gui.addFolder('Performance');
-performanceFolder.add({ ShowStats: true }, 'ShowStats').name('Show stats').onChange((value) => {
-    if (value) { stats.showPanel(0); } 
-    else { stats.showPanel(-1); }
+performanceFolder.add({ ShowStats: false }, 'ShowStats')
+    .name('Show stats')
+    .listen()
+    .onChange((value) => {
+        if (value) 
+        { 
+            stats.showPanel(0); 
+            document.body.appendChild(stats.dom);
+        } 
+        else { stats.showPanel(-1); }
 });
 performanceFolder.close();
 
 
-// Set camera position based on sun radius
+// Set initial camera position based on sun radius
 camera.position.set(-76, 28, sun.geometry.parameters.radius * 10);
 
 
