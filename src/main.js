@@ -63,7 +63,7 @@ scene.add(ambientLight);
  * Camera
  */
 export const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.lookAt(0, 0, 0);
+// camera.lookAt(0, 0, 0);
 scene.add(camera);
 
 /**
@@ -105,6 +105,9 @@ window.addEventListener('dblclick', () =>
     if (!fullscreenElement)
     {
         canvas.requestFullscreen();
+
+            // Ensure GUI is visible in fullscreen
+            gui.domElement.style.zIndex = '9999';
     }
     else
     {
@@ -116,6 +119,9 @@ window.addEventListener('dblclick', () =>
         {
             document.webkitExitFullscreen();
         }
+
+        // Reset GUI z-index when exiting fullscreen
+        gui.domElement.style.zIndex = '9999';
     }
 });
 
@@ -136,12 +142,39 @@ scene.add(solarSystemGroup);
  * Controls
  */
 const gui = new GUI();
+gui.domElement.style.cssText = 'position: absolute; top: 0px; right: 0px; z-index: 100;';
+
+// Set initial camera position based on sun radius
+const initialDistance = sun.geometry.parameters.radius * 5;
+camera.position.set(0, 0, initialDistance);
+camera.lookAt(0, 0, 0);
 
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-controls.minDistance = 30;
-controls.maxDistance = 300;
+controls.minDistance = sun.geometry.parameters.radius * 1.5;
+controls.maxDistance = initialDistance * 5;
+
+// Allow user to take control after focussing on selected planet
+controls.addEventListener('start', onControlsStart);
+controls.addEventListener('end', onControlsEnd);
+
+let userInteracting = false;
+
+function onControlsStart() 
+{
+    userInteracting = true;
+    if (objectToFollow) 
+    {
+        objectToFollow = null;
+        console.log('Camera freed from following object');
+    }
+}
+
+function onControlsEnd() 
+{
+    userInteracting = false;
+}
 
 // Add light controls to the GUI
 const lightsFolder = gui.addFolder('Lights')
@@ -217,23 +250,41 @@ function onMouseClick(event)
 window.addEventListener('click', onMouseClick);
 
 // Focus the camera on the selected object
-function focusOnObject(object)
+function focusOnObject(object) 
 {
-    const objectPosition = new THREE.Vector3();
     if (!object.isMesh) { return; }
-    const cameraOffset = new THREE.Vector3(30, 30, object.geometry.parameters.radius);
+    
+    const objectPosition = new THREE.Vector3();
     object.getWorldPosition(objectPosition);
-
+    
+    // Calculate the radius of the object
+    const radius = object.geometry.boundingSphere ? object.geometry.boundingSphere.radius : object.geometry.parameters.radius;
+    
+    // Calculate camera distance based on object size and field of view
+    const fov = camera.fov * (Math.PI / 180);
+    const distance = (radius * 2.5) / Math.tan(fov / 2);
+    
+    // Calculate camera offset
+    const cameraOffset = new THREE.Vector3(distance, distance * 0.5, distance);
+    const targetPosition = objectPosition.clone().add(cameraOffset);
+    
+    // Animate camera position and lookAt
     gsap.to(camera.position, {
         duration: 2,
-        x: objectPosition.x + cameraOffset.x,
-        y: objectPosition.y + cameraOffset.y,
-        z: objectPosition.z + cameraOffset.z,
+        x: targetPosition.x,
+        y: targetPosition.y,
+        z: targetPosition.z,
         ease: 'power2.inOut',
-        onUpdate: () => { camera.lookAt(objectPosition); },
-        onComplete: () => { controls.target.copy(objectPosition); }
+        onUpdate: () => {
+            camera.lookAt(objectPosition);
+            controls.target.copy(objectPosition);
+        },
+        onComplete: () => {
+            controls.minDistance = radius * 1.5;
+            controls.maxDistance = distance * 2;
+        }
     });
-
+    
     objectToFollow = object;
 }
 
@@ -250,6 +301,7 @@ celestialNames.forEach((celestial) => {
     }
     }, `Follow${celestial}`).name(celestial);
 });
+
 followFolder.open();
 
 // Speed controls for planets and moons
@@ -291,11 +343,6 @@ performanceFolder.add({ ShowStats: false }, 'ShowStats')
 });
 performanceFolder.close();
 
-
-// Set initial camera position based on sun radius
-camera.position.set(-76, 28, sun.geometry.parameters.radius * 10);
-
-
 // Clock
 const clock = new THREE.Clock();
 
@@ -317,8 +364,6 @@ const tick = () =>
     {
         const objectPosition = new THREE.Vector3();
         objectToFollow.getWorldPosition(objectPosition);
-        camera.position.lerp(objectPosition.clone().add(new THREE.Vector3(30, 30, objectToFollow.geometry.parameters.radius)), 0.10); 
-        camera.lookAt(objectPosition);
         controls.target.copy(objectPosition);
     }
 
