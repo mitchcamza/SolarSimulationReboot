@@ -59,6 +59,14 @@ sun.add(pointLight);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 scene.add(ambientLight);
 
+// Hemisphere light
+const hemisphereLight = new THREE.HemisphereLight(
+    0x87CEEB, // Sky color (light blue)
+    0x4B0082, // Ground color (indigo)
+    0.3 // Intensity
+);
+scene.add(hemisphereLight);
+
 /**
  * Camera
  */
@@ -194,6 +202,14 @@ lightsFolder
     .name('Ambient Light Intensity')
     .listen();
 
+const hemisphereLightFolder = lightsFolder.addFolder('Hemisphere Light');
+hemisphereLightFolder.add(hemisphereLight, 'intensity')
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name('Intensity');
+hemisphereLightFolder.addColor(hemisphereLight, 'color').name('Sky Color');
+hemisphereLightFolder.addColor(hemisphereLight, 'groundColor').name('Ground Color');
 lightsFolder.close();
 
 // Create the GUI and add the "Follow" folder
