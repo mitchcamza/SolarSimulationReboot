@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { EffectComposer } from 'three/examples/jsm/Addons.js';
+import { RenderPass } from 'three/examples/jsm/Addons.js';
+import { UnrealBloomPass } from 'three/examples/jsm/Addons.js';
 import GUI from 'lil-gui';
 import Stats from 'stats.js'
 import gsap from 'gsap';
 
 
 // import sun
-import { sun } from './sun.js';
+import { sun, sunMaterial, glowMaterial } from './sun.js';
 
 // Import planets and orbital groups
 import { planetData, orbitalGroups } from './planets.js';
@@ -67,13 +70,13 @@ scene.background = environmentMap
 const sunlightColor = new THREE.Color(0xffe7ba);
 
 // Point light
-const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
+const pointLight = new THREE.PointLight(sunlightColor, 16000, 1000, 2);
 pointLight.position.copy(sun.position);
 sun.add(pointLight);
 
 // Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-// scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0x404040, 0.1);
+scene.add(ambientLight);
 
 /**
  * Camera
@@ -85,19 +88,15 @@ scene.add(camera);
 /**
  * Renderer
  */
-// Renderer
 const renderer = new THREE.WebGLRenderer({ 
     canvas: canvas, 
     antialias: true, 
     physicallyCorrectLights: true, 
     powerPreference: "high-performance", 
+    devicePixelRatio: Math.min(window.devicePixelRatio, 2)
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.castShadow = true;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ReinhardToneMapping;
-renderer.toneMappingExposure = 2.3;
+
 
 // Handle window resize for responsiveness
 window.addEventListener('resize', () =>
@@ -363,6 +362,18 @@ performanceFolder.close();
 // Set camera position based on sun radius
 camera.position.set(-76, 28, sun.geometry.parameters.radius * 10);
 
+// Effect Composer
+const effectComposer = new EffectComposer(renderer);
+effectComposer.addPass(new RenderPass(scene, camera));
+
+// Unreal Bloom Pass
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 
+    1.0, 
+    1.8, 
+    1.0
+);
+effectComposer.addPass(bloomPass);
+
 
 // Clock
 const clock = new THREE.Clock();
@@ -380,6 +391,13 @@ const tick = () =>
     updatePlanets(elapsedTime, speed);
     updateMoons(elapsedTime, speed);
 
+    // Update time uniform
+    sunMaterial.uniforms.uTime.value = elapsedTime;
+
+    // Update camera position uniform
+    sunMaterial.uniforms.uCameraPosition.value = camera.position;
+    glowMaterial.uniforms.uCameraPosition.value = camera.position;
+
     // Update camera position to follow selected planet
     if (objectToFollow) 
     {
@@ -394,10 +412,11 @@ const tick = () =>
     controls.update();
 
     // Update shader time uniform
-    sun.material.uniforms.uTime.value = elapsedTime;
+    sunMaterial.uniforms.uTime.value = elapsedTime;
 
     // Update the renderer
     renderer.render(scene, camera);
+    // effectComposer.render();
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick);
