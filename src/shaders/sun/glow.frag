@@ -1,3 +1,11 @@
+/**
+* @file glow.frag
+* @brief Fragment shader for the sun glow effect.
+* @details This shader is used to render the sun glow effect. The glow effect is based on the distance from the sun and the camera position. The shader calculates the Fresnel effect and blends it with the glow effect based on the distance from the sun.
+@author Mitch Campbell
+@copyright 2024
+*/
+
 precision mediump float;
 
 uniform float uInnerRadius;

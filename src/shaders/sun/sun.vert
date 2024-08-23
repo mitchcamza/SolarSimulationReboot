@@ -2,6 +2,7 @@
 * @file sun.vert
 * @brief Vertex shader for the sun
 * @author Mitch Campbell
+* @copyright 2024
 */
 
 precision mediump float;

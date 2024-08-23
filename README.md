@@ -18,31 +18,34 @@ npm run build
 ## Live project
 https://solar-simulation-reboot.vercel.app
 
-![Untitled design-2](https://github.com/mitchcamza/SolarSimulationReboot/assets/63720891/eccd0bb9-47b0-4d76-9e5f-9fa8d101cd28)
-
 ## Usage
+
+### Control panel
+- Click on the controls dropdown arrow to bring up the control panel.
 
 ### Navigation Controls
 
 - **Orbit Controls**: Click and drag to orbit the camera around the scene.
+- **Pan**: Click and drag with the right mouse button to pan the camera.
+- **Zoom**: Use the mouse wheel to zoom in and out.
 
-### Celestial Body Controls
+### Selecting Celestial Bodies
+- **Click Selection**: Click on any celestial body to focus the camera on it (desktop only).
+- **GUI Selection**: Use the "Follow" dropdown menu in the GUI to select and focus on a specific celestial body.
 
-- **Follow**: Use the dropdown menu to focus the camera on a specific celestial body.
-- **Reset**: Click the "Reset" button to reset the camera position to its initial state.
+### Lights
+- **Point Light**: Adjust the intensity slider to simulate the light intensity from the sun.
+- **Ambient Light**: Use the slider to adjust ambient light. This will affect all objects in the scene.
+- **Hemisphere Light**: Adjust the intensity, sky colour, and ground colour to add additional lighting effects to the entire scene.
 
 ### Simulation Speed
 
 - **Speed Slider**: Adjust the speed of the simulation using the slider.
 - **Reset**: Click the "Reset" button to reset the simulation speed to its default value.
 
-### Visualization Options
-
-- **Wireframe**: Toggle wireframe mode for all celestial bodies.
-- **Normal**: Toggle normal material display for all celestial bodies.
-- **Grid Helper**: Toggle grid helper visibility.
-- **Axes Helper**: Toggle axes helper visibility for all celestial bodies.
-- **Show Stats**: Toggle performance stats display.
+### Performance
+- **Stats**: Toggle the `show stats` checkbox to display performance metrics, like framerate, and frametime.
+- Click on the performance metrics to switch between them. 
 
 ## Credits
 
@@ -52,6 +55,7 @@ https://solar-simulation-reboot.vercel.app
 - [NASA-3D-Resources](https://github.com/nasa/NASA-3D-Resources/tree/master) - Moon textures
 - [solarsystemscope](https://www.solarsystemscope.com/textures/) - Planet textures
 - [wwwtyro.net](https://wwwtyro.net) - Environmental map
+- [Ian McEwan, Ashima Arts](https://github.com/ashima/webgl-noise) and [Stefan Gustavson]( https://github.com/stegu/webgl-noise) - noise shader used for the sun.
 
 ## License
 

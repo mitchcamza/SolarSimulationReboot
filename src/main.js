@@ -1,3 +1,12 @@
+/**
+ * @file main.js
+ * @brief Main file for the solar system simulation.
+ * @details This file contains the main setup for the solar system simulation. It creates the scene, camera, renderer, and controls. It also adds the sun, planets, moons, and orbital groups to the scene. The file also contains the render loop and event listeners for mouse clicks and window resizing. The file also contains the GUI setup for controlling the lights, camera, and speed of the simulation.
+ * @author Mitch Campbell
+ * @copyright 2024
+ */
+
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'lil-gui';
