@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 
-function createPlanet({ name = null, radius, positionX, textures = {}, axialTilt = null, emissiveColor = null }) 
+function createPlanet({ name = null, radius, positionX, textures = {}, axialTilt = null, emissiveColor = null, initialAngle }) 
 {
     const geometry = new THREE.SphereGeometry(radius, 32, 32);
     const materialConfig = {
@@ -35,12 +35,8 @@ function createPlanet({ name = null, radius, positionX, textures = {}, axialTilt
 
     const material = new THREE.MeshStandardMaterial(materialConfig);
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = positionX;
-
-    // Set shadow properties
-    mesh.receiveShadow = true;
-    mesh.castShadow = true;
-
+    mesh.position.x = Math.cos(initialAngle) * positionX;
+    mesh.position.z = Math.sin(initialAngle) * positionX;
     return mesh;
 }
 
@@ -52,6 +48,9 @@ export const planetData = [
         positionX: 25, 
         textures: { color: 'textures/2k_mercury.jpg' },
         axialTilt: 0.034,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.24,
+        rotationSpeed: 0.01,
     },
     { 
         name: 'Venus', 
@@ -59,6 +58,9 @@ export const planetData = [
         positionX: 40, 
         textures: { color: 'textures/2k_venus_atmosphere.jpg' },
         axialTilt: 177.4,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.62,
+        rotationSpeed: 0.01,
     },
     { 
         name: 'Earth', 
@@ -70,6 +72,9 @@ export const planetData = [
             metalness: 'textures/8081_earthspec4k.jpg'
         },
         axialTilt: 23.5,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 1,
+        rotationSpeed: 0.01,
     },
     { 
         name: 'Mars', 
@@ -77,6 +82,9 @@ export const planetData = [
         positionX: 70, 
         textures: { color: 'textures/2k_mars.jpg' },
         axialTilt: 25.2,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 1.03,
+        rotationSpeed: 0.41,
     },
     { 
         name: 'Jupiter', 
@@ -85,6 +93,9 @@ export const planetData = [
         textures: { color: 'textures/2k_jupiter.jpg' },
         emissiveColor: 0x1a1a1a,
         axialTilt: 3.1,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.41,
+        rotationSpeed: 0.43,
     },
     { 
         name: 'Saturn', 
@@ -92,6 +103,9 @@ export const planetData = [
         positionX: 130, 
         textures: { color: 'textures/2k_saturn.jpg' },
         axialTilt: 26.7,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.43,
+        rotationSpeed: 0.72,
     },
     { 
         name: 'Uranus', 
@@ -99,6 +113,9 @@ export const planetData = [
         positionX: 160, 
         textures: { color: 'textures/2k_uranus.jpg' },
         axialTilt: 97.8,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.72,
+        rotationSpeed: 0.67,
     },
     { 
         name: 'Neptune', 
@@ -106,6 +123,9 @@ export const planetData = [
         positionX: 190, 
         textures: { color: 'textures/2k_neptune.jpg' },
         axialTilt: 28.3,
+        initialAngle: Math.random() * Math.PI * 2,
+        orbitalSpeed: 0.67,
+        rotationSpeed: 0.74,
     },
 ];
 
