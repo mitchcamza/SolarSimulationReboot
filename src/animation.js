@@ -1,3 +1,12 @@
+/**
+ * @file animation.js
+ * @brief Functions for updating the positions of the moons and planets.
+ * @details This file contains functions for updating the positions of the moons and planets based on the elapsed time and speed factor. The updateMoons function updates the positions of the moons based on their orbital speed and rotation speed. The updatePlanets function updates the positions of the planets based on their orbital speed and axial tilt.
+ * @author Mitch Campbell
+ * @copyright 2024
+ */
+
+
 import { MathUtils } from 'three';
 
 import { planets, orbitalGroups } from './planets.js';

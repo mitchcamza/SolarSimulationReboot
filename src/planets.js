@@ -1,3 +1,11 @@
+/**
+ * @file planets.js
+ * @brief Functions for creating and managing the planets.
+ * @author Mitch Campbell
+ * @copyright 2024
+ */
+
+
 import * as THREE from 'three';
 
 

@@ -1,3 +1,12 @@
+/**
+ * @file sun.js
+ * @brief Functions for creating and managing the sun.
+ * @details This file contains functions for creating and managing the sun. The sun is created as a sphere with a custom shader material that simulates the sun's atmosphere. The sun also has a glow effect that is created using a second sphere with a separate shader material. The sun and glow sphere are added to the scene and the glow sphere is added as a child of the sun.
+ * @author Mitch Campbell
+ * @copyright 2024
+ */
+
+
 import * as THREE from 'three';
 import vertexShader from './shaders/sun/sun.vert';
 import fragmentShader from './shaders/sun/sun.frag';
