@@ -160,6 +160,7 @@ scene.add(solarSystemGroup);
  */
 const gui = new GUI();
 gui.domElement.style.cssText = 'position: absolute; top: 0px; right: 0px; z-index: 100;';
+gui.close();
 
 // Set initial camera position based on sun radius
 const initialDistance = sun.geometry.parameters.radius * 5;
