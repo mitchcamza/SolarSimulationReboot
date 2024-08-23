@@ -1,3 +1,12 @@
+/**
+ * @file main.js
+ * @brief Main file for the solar system simulation.
+ * @details This file contains the main setup for the solar system simulation. It creates the scene, camera, renderer, and controls. It also adds the sun, planets, moons, and orbital groups to the scene. The file also contains the render loop and event listeners for mouse clicks and window resizing. The file also contains the GUI setup for controlling the lights, camera, and speed of the simulation.
+ * @author Mitch Campbell
+ * @copyright 2024
+ */
+
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'lil-gui';
@@ -31,22 +40,6 @@ const aspect = { width: window.innerWidth, height: window.innerHeight };
 const scene = new THREE.Scene();
 
 /**
- * Performance stats
- */
-const stats = new Stats();
-stats.showPanel(0);
-document.body.appendChild(stats.dom);
-
-/**
- * Helpers
- */
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
-
-const gridHelper = new THREE.GridHelper(650, 650);
-scene.add(gridHelper);
-
-/**
  * Environment map
  */
 const environmentMap = environmentMapTextureLoader.load([
@@ -67,28 +60,44 @@ scene.background = environmentMap
 const sunlightColor = new THREE.Color(0xffe7ba);
 
 // Point light
-const pointLight = new THREE.PointLight(sunlightColor, 6000, 1000, 2);
+const pointLight = new THREE.PointLight(sunlightColor, 16000, 1000, 2);
 pointLight.position.copy(sun.position);
-pointLight.castShadow = true;
 sun.add(pointLight);
 
 // Ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
 scene.add(ambientLight);
 
+// Hemisphere light
+const hemisphereLight = new THREE.HemisphereLight(
+    0x87CEEB, // Sky color (light blue)
+    0x4B0082, // Ground color (indigo)
+    0.3 // Intensity
+);
+scene.add(hemisphereLight);
+
 /**
  * Camera
  */
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-76, 28, 70);
+export const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+// camera.lookAt(0, 0, 0);
 scene.add(camera);
 
 /**
  * Renderer
  */
-const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, physicallyCorrectLights: true });
+const renderer = new THREE.WebGLRenderer({ 
+    canvas: canvas, 
+    antialias: true, 
+    physicallyCorrectLights: true, 
+    powerPreference: "high-performance", 
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.castShadow = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ReinhardToneMapping;
+renderer.toneMappingExposure = 2.3;
 
 // Handle window resize for responsiveness
 window.addEventListener('resize', () =>
@@ -113,6 +122,9 @@ window.addEventListener('dblclick', () =>
     if (!fullscreenElement)
     {
         canvas.requestFullscreen();
+
+            // Ensure GUI is visible in fullscreen
+            gui.domElement.style.zIndex = '9999';
     }
     else
     {
@@ -124,6 +136,9 @@ window.addEventListener('dblclick', () =>
         {
             document.webkitExitFullscreen();
         }
+
+        // Reset GUI z-index when exiting fullscreen
+        gui.domElement.style.zIndex = '9999';
     }
 });
 
@@ -144,19 +159,46 @@ scene.add(solarSystemGroup);
  * Controls
  */
 const gui = new GUI();
+gui.domElement.style.cssText = 'position: absolute; top: 0px; right: 0px; z-index: 100;';
+
+// Set initial camera position based on sun radius
+const initialDistance = sun.geometry.parameters.radius * 5;
+camera.position.set(0, 0, initialDistance);
+camera.lookAt(0, 0, 0);
 
 // Orbit controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
-controls.minDistance = 40;
-controls.maxDistance = 300;
+controls.minDistance = sun.geometry.parameters.radius * 1.5;
+controls.maxDistance = initialDistance * 5;
+
+// Allow user to take control after focussing on selected planet
+controls.addEventListener('start', onControlsStart);
+controls.addEventListener('end', onControlsEnd);
+
+let userInteracting = false;
+
+function onControlsStart() 
+{
+    userInteracting = true;
+    if (objectToFollow) 
+    {
+        objectToFollow = null;
+        console.log('Camera freed from following object');
+    }
+}
+
+function onControlsEnd() 
+{
+    userInteracting = false;
+}
 
 // Add light controls to the GUI
 const lightsFolder = gui.addFolder('Lights')
 lightsFolder
     .add(pointLight, 'intensity')
     .min(0)
-    .max(10000)
+    .max(20000)
     .step(1)
     .name('Point Light Intensity')
     .listen()
@@ -169,6 +211,14 @@ lightsFolder
     .name('Ambient Light Intensity')
     .listen();
 
+const hemisphereLightFolder = lightsFolder.addFolder('Hemisphere Light');
+hemisphereLightFolder.add(hemisphereLight, 'intensity')
+    .min(0)
+    .max(1)
+    .step(0.01)
+    .name('Intensity');
+hemisphereLightFolder.addColor(hemisphereLight, 'color').name('Sky Color');
+hemisphereLightFolder.addColor(hemisphereLight, 'groundColor').name('Ground Color');
 lightsFolder.close();
 
 // Create the GUI and add the "Follow" folder
@@ -225,23 +275,41 @@ function onMouseClick(event)
 window.addEventListener('click', onMouseClick);
 
 // Focus the camera on the selected object
-function focusOnObject(object)
+function focusOnObject(object) 
 {
-    const objectPosition = new THREE.Vector3();
     if (!object.isMesh) { return; }
-    const cameraOffset = new THREE.Vector3(30, 30, object.geometry.parameters.radius);
+    
+    const objectPosition = new THREE.Vector3();
     object.getWorldPosition(objectPosition);
-
+    
+    // Calculate the radius of the object
+    const radius = object.geometry.boundingSphere ? object.geometry.boundingSphere.radius : object.geometry.parameters.radius;
+    
+    // Calculate camera distance based on object size and field of view
+    const fov = camera.fov * (Math.PI / 180);
+    const distance = (radius * 2.5) / Math.tan(fov / 2);
+    
+    // Calculate camera offset
+    const cameraOffset = new THREE.Vector3(distance, distance * 0.5, distance);
+    const targetPosition = objectPosition.clone().add(cameraOffset);
+    
+    // Animate camera position and lookAt
     gsap.to(camera.position, {
         duration: 2,
-        x: objectPosition.x + cameraOffset.x,
-        y: objectPosition.y + cameraOffset.y,
-        z: objectPosition.z + cameraOffset.z,
+        x: targetPosition.x,
+        y: targetPosition.y,
+        z: targetPosition.z,
         ease: 'power2.inOut',
-        onUpdate: () => { camera.lookAt(objectPosition); },
-        onComplete: () => { controls.target.copy(objectPosition); }
+        onUpdate: () => {
+            camera.lookAt(objectPosition);
+            controls.target.copy(objectPosition);
+        },
+        onComplete: () => {
+            controls.minDistance = radius * 1.5;
+            controls.maxDistance = distance * 2;
+        }
     });
-
+    
     objectToFollow = object;
 }
 
@@ -258,6 +326,7 @@ celestialNames.forEach((celestial) => {
     }
     }, `Follow${celestial}`).name(celestial);
 });
+
 followFolder.open();
 
 // Speed controls for planets and moons
@@ -281,75 +350,23 @@ speedFolder.add({ Reset: () => {
 } }, 'Reset').name('Reset');
 speedFolder.close();
 
-// Material Folder
-const materialFolder = gui.addFolder('Materials');
-materialFolder.add({ Wireframe: false }, 'Wireframe').name('Wireframe').onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-            object.material.wireframe = value; 
-        }});
-    });
-
-// Toggle MeshNormalMaterial
-materialFolder.add({ Normal: false }, 'Normal').name('Normal').onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) 
-        {
-            if (value) 
-            {
-                object.userData.originalMaterial = object.material;
-                object.material.dispose();
-                if (object.material.wireframe) 
-                {
-                    object.material = new THREE.MeshNormalMaterial({ wireframe: true });
-                } 
-                else 
-                {
-                    object.material = new THREE.MeshNormalMaterial();
-                }
-            } 
-            else 
-            {
-                if (object.userData.originalMaterial) 
-                {
-                    object.material.dispose();
-                    object.material = object.userData.originalMaterial;
-                    delete object.userData.originalMaterial;
-                }
-            }
-        }
-    });
-});
-materialFolder.close();
-
-// Helpers folder
-const helperFolder = gui.addFolder('Helpers');
-helperFolder.add(gridHelper, 'visible').name('Grid Helper').setValue(false);
-helperFolder.close();
-
-// Toggle Axes Helper for all celestial bodies
-helperFolder.add({ AxesHelper: false }, 'AxesHelper').name('Axes Helper').setValue(false).onChange((value) => {
-    solarSystemGroup.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-            object.children[0].visible = value; 
-        }});
-    }   
-);
-
-// Add a point light helper
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 2);
-pointLightHelper.visible = false;
-helperFolder.add(pointLightHelper, 'visible').name('Point Light Helper').listen();
-scene.add(pointLightHelper);
-
-// Performance folder
+/**
+ * Performance stats
+ */
+const stats = new Stats();
 const performanceFolder = gui.addFolder('Performance');
-performanceFolder.add({ ShowStats: true }, 'ShowStats').name('Show stats').onChange((value) => {
-    if (value) { stats.showPanel(0); } 
-    else { stats.showPanel(-1); }
+performanceFolder.add({ ShowStats: false }, 'ShowStats')
+    .name('Show stats')
+    .listen()
+    .onChange((value) => {
+        if (value) 
+        { 
+            stats.showPanel(0); 
+            document.body.appendChild(stats.dom);
+        } 
+        else { stats.showPanel(-1); }
 });
 performanceFolder.close();
-
 
 // Clock
 const clock = new THREE.Clock();
@@ -372,8 +389,6 @@ const tick = () =>
     {
         const objectPosition = new THREE.Vector3();
         objectToFollow.getWorldPosition(objectPosition);
-        camera.position.lerp(objectPosition.clone().add(new THREE.Vector3(30, 30, objectToFollow.geometry.parameters.radius)), 0.10); 
-        camera.lookAt(objectPosition);
         controls.target.copy(objectPosition);
     }
 
