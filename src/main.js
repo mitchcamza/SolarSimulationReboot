@@ -12,6 +12,7 @@ import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'lil-gui';
 import Stats from 'stats.js'
 import gsap from 'gsap';
+import { inject } from '@vercel/analytics';
 
 
 // import sun
@@ -22,6 +23,11 @@ import { planetData, orbitalGroups } from './planets.js';
 
 // Import animation functions
 import { updatePlanets, updateMoons } from './animation.js';
+
+/**
+ * Initialize Vercel Web Analytics
+ */
+inject();
 
 /**
  * Loaders
