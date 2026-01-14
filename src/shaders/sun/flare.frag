@@ -61,8 +61,11 @@ void main()
     // Center the UV
     uv = uv * 2.0 - 1.0;
     
+    // Cache commonly used value for performance
+    float uvXAbs = abs(uv.x);
+    
     // Create elongated flare shape with stronger base
-    float flareShape = 1.0 - abs(uv.x);
+    float flareShape = 1.0 - uvXAbs;
     flareShape = pow(flareShape, 1.5);
     
     // Add height falloff with visible base
@@ -81,8 +84,8 @@ void main()
     float flare = flareShape * (0.5 + turbulence * 0.5);
     
     // Add very bright core at base
-    float coreIntensity = pow(1.0 - abs(uv.x), 3.0) * smoothstep(0.3, -0.3, uv.y);
-    float core = coreIntensity * 3.0;
+    float coreShape = pow(1.0 - uvXAbs, 3.0) * smoothstep(0.3, -0.3, uv.y);
+    float core = coreShape * 3.0;
     flare = max(flare * 1.5, core);
     
     // Color gradient from bright yellow-white at base to orange-red at tips
@@ -96,8 +99,8 @@ void main()
     // Apply flare intensity
     float alpha = flare * uFlareIntensity;
     
-    // Ensure minimum visibility at base
-    alpha = max(alpha, coreIntensity * uFlareIntensity * 0.8);
+    // Ensure minimum visibility at base using the cached core calculation
+    alpha = max(alpha, coreShape * uFlareIntensity * 0.8);
     
     // Clamp alpha for performance
     alpha = clamp(alpha, 0.0, 1.0);

@@ -101,7 +101,8 @@ for (let i = 0; i < flareCount; i++) {
     );
     
     // Orient flare to point outward from sun surface
-    flareMesh.lookAt(0, 0, 0);
+    const outwardPoint = flareMesh.position.clone().multiplyScalar(2);
+    flareMesh.lookAt(outwardPoint);
     flareMesh.rotateX(Math.PI / 2);
     
     // Store reference for animation
