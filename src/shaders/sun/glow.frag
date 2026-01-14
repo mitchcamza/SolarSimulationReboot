@@ -25,15 +25,33 @@ void main()
     // Calculate the view direction
     vec3 viewDirection = normalize(uCameraPosition - vPosition);
 
-    // Calculate the Fresnel effect
-    float fresnel = pow(1.0 - dot(vNormal, viewDirection), 3.0);
+    // Calculate the Fresnel effect with softer falloff for corona
+    float fresnelPower = 2.0;
+    float fresnel = pow(1.0 - abs(dot(vNormal, viewDirection)), fresnelPower);
 
-    // // Calculate the glow effect based on distance
-    float dist = distance(gl_FragCoord.xy, uCenter.xy);
-    float glow = smoothstep(uInnerRadius, uOuterRadius, dist);
-
-    // Blend the Fresnel effect with the glow effect
-    vec3 glowColor = mix(uSunColor * fresnel, vec3(0.0), glow);
+    // Enhanced glow effect with multiple layers for realism
+    // Inner bright corona
+    float innerGlow = pow(1.0 - abs(dot(vNormal, viewDirection)), 4.0);
     
-    gl_FragColor = vec4(uGlowColor * glow * uGlowIntensity, glow);
+    // Outer soft corona
+    float outerGlow = pow(1.0 - abs(dot(vNormal, viewDirection)), 1.5);
+    
+    // Combine glow layers
+    float combinedGlow = innerGlow * 0.6 + outerGlow * 0.4;
+    
+    // Add Fresnel rim lighting
+    float rim = fresnel * 0.8;
+    
+    // Final glow with intensity control
+    float finalGlow = (combinedGlow + rim) * uGlowIntensity;
+    
+    // Color gradient from yellow-orange to orange-red
+    vec3 innerColor = vec3(1.0, 0.9, 0.3);  // Bright yellow
+    vec3 outerColor = vec3(1.0, 0.3, 0.0);  // Orange-red
+    vec3 finalColor = mix(outerColor, innerColor, fresnel);
+    
+    // Apply intensity and add subtle pulsing effect
+    finalColor *= finalGlow;
+    
+    gl_FragColor = vec4(finalColor, finalGlow * 0.7);
 }
