@@ -1,5 +1,5 @@
 # SolarSimulationReboot
-A simplified solar system simulation using ThreeJS
+An interactive 3D solar system simulation to explore orbital motion, scaling, and real-time visualization in the browser
 
 ## Setup
 Download and install [Node.js](https://nodejs.org/en/download/) and run the following commands in the project's root directory:
