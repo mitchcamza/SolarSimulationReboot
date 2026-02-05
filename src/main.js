@@ -16,7 +16,7 @@ import { inject } from '@vercel/analytics';
 
 
 // import sun
-import { sun } from './sun.js';
+import { sun, solarFlares } from './sun.js';
 
 // Import planets and orbital groups
 import { planetData, orbitalGroups } from './planets.js';
@@ -404,6 +404,16 @@ const tick = () =>
 
     // Update shader time uniform
     sun.material.uniforms.uTime.value = elapsedTime;
+
+    // Rotate sun slowly to show flares
+    sun.rotation.y = elapsedTime * 0.05;
+
+    // Update solar flare animations
+    solarFlares.forEach((flare) => {
+        if (flare.material.uniforms.uTime) {
+            flare.material.uniforms.uTime.value = elapsedTime;
+        }
+    });
 
     // Update the renderer
     renderer.render(scene, camera);

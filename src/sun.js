@@ -11,6 +11,8 @@ import * as THREE from 'three';
 import vertexShader from './shaders/sun/sun.vert';
 import fragmentShader from './shaders/sun/sun.frag';
 import glowFragmentShader from './shaders/sun/glow.frag'
+import flareVertexShader from './shaders/sun/flare.vert';
+import flareFragmentShader from './shaders/sun/flare.frag';
 
 
 // Sun Material
@@ -45,15 +47,66 @@ export const glowMaterial = new THREE.RawShaderMaterial({
         uInnerRadius: { value: sun.geometry.parameters.radius * 1.1 },
         uOuterRadius: { value: sun.geometry.parameters.radius * 1.2 },
         uGlowColor: { value: new THREE.Color('orange') },
-        uGlowIntensity: { value: 1.0 },
+        uGlowIntensity: { value: 1.5 },
         uCameraPosition: { value: new THREE.Vector3() },
     },
     blending: THREE.AdditiveBlending,
     transparent: true,
+    depthWrite: false,
 });
 
 const glowMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(sun.geometry.parameters.radius * 1.01, 32, 32),
+    new THREE.SphereGeometry(sun.geometry.parameters.radius * 1.4, 32, 32),
     glowMaterial
 );
 sun.add(glowMesh);
+
+// Solar Flares
+// Create solar flares - multiple small prominences around the sun
+export const solarFlares = [];
+const flareCount = 6; // Keep count low for performance
+const sunRadius = sun.geometry.parameters.radius;
+
+for (let i = 0; i < flareCount; i++) {
+    // Create flare material (each flare gets its own material for independent animation)
+    const flareMaterial = new THREE.RawShaderMaterial({
+        vertexShader: flareVertexShader,
+        fragmentShader: flareFragmentShader,
+        uniforms: {
+            uTime: { value: Math.random() * 10.0 }, // Random start time for variety
+            uFlareIntensity: { value: 1.0 + Math.random() * 0.5 },
+            uFlareColor: { value: new THREE.Color(1.0, 0.5, 0.1) },
+        },
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+    });
+    
+    // Create flare geometry - simple plane for performance
+    const flareWidth = sunRadius * 0.6;
+    const flareHeight = sunRadius * (2.0 + Math.random() * 1.5); // Larger, more visible flares
+    const flareGeometry = new THREE.PlaneGeometry(flareWidth, flareHeight);
+    
+    const flareMesh = new THREE.Mesh(flareGeometry, flareMaterial);
+    
+    // Position flares around the equator and mid-latitudes for better visibility
+    const angle = (i / flareCount) * Math.PI * 2;
+    const latitude = (Math.random() - 0.5) * Math.PI * 0.5; // -45° to +45°
+    
+    flareMesh.position.set(
+        sunRadius * Math.cos(latitude) * Math.cos(angle),
+        sunRadius * Math.sin(latitude),
+        sunRadius * Math.cos(latitude) * Math.sin(angle)
+    );
+    
+    // Orient flare to point outward from sun surface
+    const outwardPoint = flareMesh.position.clone().multiplyScalar(2);
+    flareMesh.lookAt(outwardPoint);
+    flareMesh.rotateX(Math.PI / 2);
+    
+    // Store reference for animation
+    solarFlares.push(flareMesh);
+    
+    sun.add(flareMesh);
+}
